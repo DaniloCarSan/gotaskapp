@@ -1,4 +1,4 @@
-# :ballot_box_with_check: PROJETO GO TASK APP
+# :ballot_box_with_check: GO TASK APP
 
 Um simples aplicativo de tarefa construído para adquirir e desenvolver
 habilidades nas ferramentas utilizadas para a contrução desta aplicação.
