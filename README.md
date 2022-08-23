@@ -32,5 +32,5 @@ habilidades nas ferramentas utilizadas para a contrução desta aplicação.
 - GITHUB
 - MYSQL WORKBENCH
 - NOTION
-- POSTMAN
+- THUNDER CLIENT FOR VSCODE
 - VS CODE
