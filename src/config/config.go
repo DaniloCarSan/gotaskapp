@@ -12,6 +12,7 @@ var (
 	APP_PORT      = ""
 	APP_HOST      = ""
 	APP_HOST_FULL = ""
+	SENTRY_DNS    = ""
 )
 
 // Load application settings
@@ -42,6 +43,18 @@ func Load(fileEnv string) error {
 	APP_PORT = value
 
 	APP_HOST_FULL = fmt.Sprintf("%s:%s", APP_HOST, APP_PORT)
+
+	value, exists = os.LookupEnv("SENTRY_DNS")
+
+	if !exists {
+		return errors.New("not found variable APP_PORT in .env file")
+	}
+
+	if value == "" {
+		return errors.New("required a value for variable SENTRY in .env file")
+	}
+
+	SENTRY_DNS = value
 
 	return nil
 }

@@ -1,23 +1,12 @@
 package routers
 
-import (
-	"net/http"
-)
+import "github.com/gin-gonic/gin"
 
-var User = RouteGroup{
-	Name: "/users",
-	Routes: []Route{
-		{
-			URI:                   "",
-			Method:                http.MethodGet,
-			Execute:               func(http.ResponseWriter, *http.Request) {},
-			RequireAuthentication: true,
-		},
-		{
-			URI:                   "",
-			Method:                http.MethodPatch,
-			Execute:               func(http.ResponseWriter, *http.Request) {},
-			RequireAuthentication: true,
-		},
-	},
+// Routers of user
+func User(app *gin.Engine) {
+	users := app.Group("/users")
+	{
+		users.GET("", func(ctx *gin.Context) {})
+		users.PATCH("", func(ctx *gin.Context) {})
+	}
 }

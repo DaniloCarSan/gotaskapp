@@ -1,47 +1,16 @@
 package routers
 
-import (
-	"net/http"
-)
+import "github.com/gin-gonic/gin"
 
-var Task = RouteGroup{
-	Name: "/tasks",
-	Routes: []Route{
-		{
-			URI:                   "",
-			Method:                http.MethodPost,
-			Execute:               func(http.ResponseWriter, *http.Request) {},
-			RequireAuthentication: true,
-		},
-		{
-			URI:                   "",
-			Method:                http.MethodGet,
-			Execute:               func(http.ResponseWriter, *http.Request) {},
-			RequireAuthentication: true,
-		},
-		{
-			URI:                   "/{id:[0-9]+}",
-			Method:                http.MethodGet,
-			Execute:               func(http.ResponseWriter, *http.Request) {},
-			RequireAuthentication: true,
-		},
-		{
-			URI:                   "",
-			Method:                http.MethodPut,
-			Execute:               func(http.ResponseWriter, *http.Request) {},
-			RequireAuthentication: true,
-		},
-		{
-			URI:                   "/{id:[0-9]+}",
-			Method:                http.MethodDelete,
-			Execute:               func(http.ResponseWriter, *http.Request) {},
-			RequireAuthentication: true,
-		},
-		{
-			URI:                   "/toggle/done/{id:[0-9]+}",
-			Method:                http.MethodPatch,
-			Execute:               func(http.ResponseWriter, *http.Request) {},
-			RequireAuthentication: true,
-		},
-	},
+// Routers of task
+func Task(app *gin.Engine) {
+	tasks := app.Group("/tasks")
+	{
+		tasks.POST("", func(ctx *gin.Context) {})
+		tasks.GET("", func(ctx *gin.Context) {})
+		tasks.GET("/:id", func(ctx *gin.Context) {})
+		tasks.PUT("", func(ctx *gin.Context) {})
+		tasks.DELETE("/:id", func(ctx *gin.Context) {})
+		tasks.PATCH("/toggle/done/{id:[0-9]+}", func(ctx *gin.Context) {})
+	}
 }

@@ -1,35 +1,16 @@
 package routers
 
 import (
-	"net/http"
+	"github.com/gin-gonic/gin"
 )
 
-var Auth = RouteGroup{
-	Name: "/auth",
-	Routes: []Route{
-		{
-			URI:                   "/sign/in",
-			Method:                http.MethodPost,
-			Execute:               func(http.ResponseWriter, *http.Request) {},
-			RequireAuthentication: false,
-		},
-		{
-			URI:                   "/sign/up",
-			Method:                http.MethodPost,
-			Execute:               func(http.ResponseWriter, *http.Request) {},
-			RequireAuthentication: false,
-		},
-		{
-			URI:                   "/password/reset",
-			Method:                http.MethodPost,
-			Execute:               func(http.ResponseWriter, *http.Request) {},
-			RequireAuthentication: false,
-		},
-		{
-			URI:                   "/token/renew",
-			Method:                http.MethodGet,
-			Execute:               func(http.ResponseWriter, *http.Request) {},
-			RequireAuthentication: true,
-		},
-	},
+// Routers of authentication
+func Auth(app *gin.Engine) {
+	auth := app.Group("/auth")
+	{
+		auth.POST("/sign/in", func(ctx *gin.Context) {})
+		auth.POST("/sign/up", func(ctx *gin.Context) {})
+		auth.POST("/password/reset", func(ctx *gin.Context) {})
+		auth.POST("/token/renew", func(ctx *gin.Context) {})
+	}
 }
