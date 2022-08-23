@@ -11,7 +11,7 @@ import (
 func Auth(app *gin.Engine) {
 	authGroup := app.Group("/auth")
 	{
-		authGroup.POST("/sign/up", authController.SignUp)
+		authGroup.POST("/sign/up", authController.SignUpValidateRequest)
 		authGroup.POST("/sign/in", authController.SignIn)
 		authGroup.POST("/password/reset", authController.PasswordReset)
 		authGroup.POST("/{:id}/token/renew", middlewares.Authenticate(), authController.TokenRenew)
