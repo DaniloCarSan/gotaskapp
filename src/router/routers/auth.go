@@ -4,7 +4,7 @@ import (
 	"net/http"
 )
 
-var routersAuth = RouteGroup{
+var Auth = RouteGroup{
 	Name: "/auth",
 	Routes: []Route{
 		{

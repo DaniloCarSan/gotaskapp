@@ -4,7 +4,7 @@ import (
 	"net/http"
 )
 
-var routersTask = RouteGroup{
+var Task = RouteGroup{
 	Name: "/tasks",
 	Routes: []Route{
 		{
