@@ -1,6 +1,7 @@
 package routers
 
 import (
+	userController "gotaskapp/src/controllers/user"
 	"gotaskapp/src/middlewares"
 
 	"github.com/gin-gonic/gin"
@@ -8,9 +9,9 @@ import (
 
 // Routers of user
 func User(app *gin.Engine) {
-	users := app.Group("/users", middlewares.Authenticate())
+	usersGroup := app.Group("/users", middlewares.Authenticate())
 	{
-		users.GET("", func(ctx *gin.Context) {})
-		users.PATCH("", func(ctx *gin.Context) {})
+		usersGroup.GET("", userController.Select)
+		usersGroup.PUT("", userController.Update)
 	}
 }
