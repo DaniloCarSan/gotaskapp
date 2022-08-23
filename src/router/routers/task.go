@@ -1,10 +1,14 @@
 package routers
 
-import "github.com/gin-gonic/gin"
+import (
+	"gotaskapp/src/middlewares"
+
+	"github.com/gin-gonic/gin"
+)
 
 // Routers of task
 func Task(app *gin.Engine) {
-	tasks := app.Group("/tasks")
+	tasks := app.Group("/tasks", middlewares.Authenticate())
 	{
 		tasks.POST("", func(ctx *gin.Context) {})
 		tasks.GET("", func(ctx *gin.Context) {})

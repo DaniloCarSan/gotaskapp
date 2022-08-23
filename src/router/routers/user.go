@@ -1,10 +1,14 @@
 package routers
 
-import "github.com/gin-gonic/gin"
+import (
+	"gotaskapp/src/middlewares"
+
+	"github.com/gin-gonic/gin"
+)
 
 // Routers of user
 func User(app *gin.Engine) {
-	users := app.Group("/users")
+	users := app.Group("/users", middlewares.Authenticate())
 	{
 		users.GET("", func(ctx *gin.Context) {})
 		users.PATCH("", func(ctx *gin.Context) {})
