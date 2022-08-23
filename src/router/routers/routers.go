@@ -35,6 +35,8 @@ func PublishInMux(r *mux.Router) *mux.Router {
 	goThroughRoutes(
 		[]RouteGroup{
 			routersAuth,
+			routersUser,
+			routersTask,
 		},
 		func(route Route) {
 			r.HandleFunc(route.URI, route.Execute).Methods(route.Method)
