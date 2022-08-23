@@ -3,6 +3,8 @@
 Um simples aplicativo de tarefa construído para adquirir e desenvolver
 habilidades nas ferramentas utilizadas para a contrução desta aplicação.
 
+![Dev Unit test](https://github.com/danilocarsan/gotaskapp/actions/workflows/dev.yaml/badge.svg?branch=dev)
+
 ## :open_file_folder: FUNCIONALIDADES
 
 :closed_lock_with_key: **Autenticação**
