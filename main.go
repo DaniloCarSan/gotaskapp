@@ -9,7 +9,9 @@ import (
 
 func main() {
 
-	config.Load()
+	if err := config.Load(".env"); err != nil {
+		log.Fatal(err)
+	}
 
 	r := router.LoadRouters()
 

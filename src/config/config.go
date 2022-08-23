@@ -1,35 +1,47 @@
 package config
 
 import (
+	"errors"
 	"fmt"
-	"log"
 	"os"
-	"strconv"
 
 	"github.com/joho/godotenv"
 )
 
 var (
-	APP_PORT      = 0
+	APP_PORT      = ""
 	APP_HOST      = ""
 	APP_HOST_FULL = ""
 )
 
 // Load application settings
-func Load() {
+func Load(fileEnv string) error {
 
 	var err error
-	if err = godotenv.Load(); err != nil {
-		log.Fatal(err)
+	var value string
+	var exists bool
+
+	if err = godotenv.Load(fileEnv); err != nil {
+		return err
 	}
 
-	APP_PORT, err = strconv.Atoi(os.Getenv("APP_PORT"))
+	value, exists = os.LookupEnv("APP_HOST")
 
-	if err != nil {
-		APP_PORT = 5000
+	if !exists {
+		return errors.New("not found variable APP_HOST in .env file")
 	}
 
-	APP_HOST = os.Getenv("APP_HOST")
+	APP_HOST = value
 
-	APP_HOST_FULL = fmt.Sprintf("%s:%d", APP_HOST, APP_PORT)
+	value, exists = os.LookupEnv("APP_PORT")
+
+	if !exists {
+		return errors.New("not found variable APP_PORT in .env file")
+	}
+
+	APP_PORT = value
+
+	APP_HOST_FULL = fmt.Sprintf("%s:%s", APP_HOST, APP_PORT)
+
+	return nil
 }
