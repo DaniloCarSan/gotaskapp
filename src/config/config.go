@@ -20,6 +20,7 @@ var (
 	DB_HOST       = ""
 	DB_PORT       = ""
 	DB_NAME       = ""
+	JWT_SECRET    = ""
 )
 
 // Load application settings
@@ -90,6 +91,12 @@ func Load(fileEnv string) error {
 		os.Getenv("DB_PORT"),
 		os.Getenv("DB_NAME"),
 	)
+
+	value, exists = os.LookupEnv("JWT_SECRET")
+	if value == "" || !exists {
+		return errors.New("not found variable JWT_SECRET in .env file or variable empty")
+	}
+	JWT_SECRET = value
 
 	return nil
 }
