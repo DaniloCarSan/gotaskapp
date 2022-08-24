@@ -54,6 +54,11 @@ func SignIn(c *gin.Context) {
 		return
 	}
 
+	if !user.IsEmailVerified() {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Email no verified"})
+		return
+	}
+
 	token, err := security.GenerateJwtToken(user.Id)
 
 	if err != nil {
