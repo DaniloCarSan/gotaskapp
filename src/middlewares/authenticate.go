@@ -11,7 +11,15 @@ import (
 func Authenticate() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
-		if err := security.ValidateJwtToken(c.Request); err != nil {
+		var tokenString string
+		var err error
+
+		if tokenString, err = security.ExtractJwtTokenFromHeaderAuthorization(c.Request); err != nil {
+			c.JSON(http.StatusUnauthorized, err.Error())
+			return
+		}
+
+		if _, err := security.ValidateJwtToken(tokenString); err != nil {
 			c.JSON(http.StatusUnauthorized, err.Error())
 			return
 		}

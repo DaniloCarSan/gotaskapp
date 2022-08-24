@@ -1,10 +1,15 @@
 package auth
 
 import (
+	"fmt"
+	"gotaskapp/src/config"
 	"gotaskapp/src/database"
 	"gotaskapp/src/entities"
+	"gotaskapp/src/helpers"
 	repositories "gotaskapp/src/repositories/user"
+	"gotaskapp/src/security"
 	"net/http"
+	"strings"
 
 	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-gonic/gin"
@@ -16,6 +21,19 @@ type signUp struct {
 	Email     string `form:"email" binding:"required,email"`
 	Password  string `form:"password" binding:"required,min=6,max=16"`
 }
+
+var emailSignUpbody = `
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+   <title>Link de confirmação da conta</title>
+</head>
+<body>
+   <p>Obrigafo por criar uma conta no <b>Go TaskApp</b></p>
+   <p>Clique neste link <a href="{{LINK}}">aqui</a> para confirmar seu email.</p>
+   <p>Caso não tenha criado uma conta ignore este email.</p>
+</body>
+`
 
 // Sign up
 func SignUp(c *gin.Context) {
@@ -85,7 +103,31 @@ func SignUp(c *gin.Context) {
 
 	user.Id = id
 
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"user": user,
+	token, err := security.GenerateJwtToken(user.Id)
+
+	if err != nil {
+		if hub := sentrygin.GetHubFromContext(c); hub != nil {
+			hub.CaptureException(err)
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{})
+		return
+	}
+
+	link := fmt.Sprintf("http://%s%s%s", config.APP_HOST_FULL, "/auth/email/verify/", token)
+
+	emailSignUpbody = strings.ReplaceAll(emailSignUpbody, "{{LINK}}", link)
+
+	err = helpers.SendEmail([]string{user.Email}, []string{}, "Confirmação de email", emailSignUpbody)
+
+	if err != nil {
+		if hub := sentrygin.GetHubFromContext(c); hub != nil {
+			hub.CaptureException(err)
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Account created successfully, a verification link has been sent to your email.",
 	})
 }

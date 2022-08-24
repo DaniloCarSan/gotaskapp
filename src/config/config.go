@@ -4,23 +4,28 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/joho/godotenv"
 )
 
 var (
-	APP_PORT      = ""
-	APP_HOST      = ""
-	APP_HOST_FULL = ""
-	SENTRY_DNS    = ""
-	DB_DRIVE      = "mysql"
-	DB_ADDR       = "%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local"
-	DB_USER       = ""
-	DB_PASS       = ""
-	DB_HOST       = ""
-	DB_PORT       = ""
-	DB_NAME       = ""
-	JWT_SECRET    = ""
+	APP_PORT       = ""
+	APP_HOST       = ""
+	APP_HOST_FULL  = ""
+	SENTRY_DNS     = ""
+	DB_DRIVE       = "mysql"
+	DB_ADDR        = "%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local"
+	DB_USER        = ""
+	DB_PASS        = ""
+	DB_HOST        = ""
+	DB_PORT        = ""
+	DB_NAME        = ""
+	JWT_SECRET     = ""
+	EMAIL_HOST     = ""
+	EMAIL_FROM     = ""
+	EMAIL_PASSWORD = ""
+	EMAIL_PORT     = 0
 )
 
 // Load application settings
@@ -97,6 +102,34 @@ func Load(fileEnv string) error {
 		return errors.New("not found variable JWT_SECRET in .env file or variable empty")
 	}
 	JWT_SECRET = value
+
+	value, exists = os.LookupEnv("EMAIL_HOST")
+	if value == "" || !exists {
+		return errors.New("not found variable EMAIL_HOST in .env file or variable empty")
+	}
+	EMAIL_HOST = value
+
+	value, exists = os.LookupEnv("EMAIL_FROM")
+	if value == "" || !exists {
+		return errors.New("not found variable EMAIL_FROM in .env file or variable empty")
+	}
+	EMAIL_FROM = value
+
+	value, exists = os.LookupEnv("EMAIL_PASSWORD")
+	if value == "" || !exists {
+		return errors.New("not found variable EMAIL_PASSWORD in .env file or variable empty")
+	}
+	EMAIL_PASSWORD = value
+
+	value, exists = os.LookupEnv("EMAIL_PORT")
+	if value == "" || !exists {
+		return errors.New("not found variable EMAIL_PORT in .env file or variable empty")
+	}
+
+	EMAIL_PORT, err = strconv.Atoi(value)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
