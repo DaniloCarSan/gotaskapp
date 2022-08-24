@@ -85,5 +85,7 @@ func SignUp(c *gin.Context) {
 
 	user.Id = id
 
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"user": user,
+	})
 }
