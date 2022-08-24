@@ -10,17 +10,11 @@ import (
 	"gotaskapp/src/security"
 	"net/http"
 	"strings"
+	"time"
 
 	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-gonic/gin"
 )
-
-type signUp struct {
-	Firstname string `form:"firstname" binding:"required,alpha"`
-	Lastname  string `form:"lastname" binding:"required,alpha"`
-	Email     string `form:"email" binding:"required,email"`
-	Password  string `form:"password" binding:"required,min=6,max=16"`
-}
 
 var emailSignUpbody = `
 <html>
@@ -29,11 +23,18 @@ var emailSignUpbody = `
    <title>Link de confirmação da conta</title>
 </head>
 <body>
-   <p>Obrigafo por criar uma conta no <b>Go TaskApp</b></p>
+   <p>Obrigago por criar uma conta no <b>Go TaskApp</b></p>
    <p>Clique neste link <a href="{{LINK}}">aqui</a> para confirmar seu email.</p>
    <p>Caso não tenha criado uma conta ignore este email.</p>
 </body>
 `
+
+type signUp struct {
+	Firstname string `form:"firstname" binding:"required,alpha"`
+	Lastname  string `form:"lastname" binding:"required,alpha"`
+	Email     string `form:"email" binding:"required,email"`
+	Password  string `form:"password" binding:"required,min=6,max=16"`
+}
 
 // Sign up
 func SignUp(c *gin.Context) {
@@ -103,7 +104,7 @@ func SignUp(c *gin.Context) {
 
 	user.Id = id
 
-	token, err := security.GenerateJwtToken(user.Id)
+	token, err := security.GenerateJwtToken(user.Id, time.Hour*6)
 
 	if err != nil {
 		if hub := sentrygin.GetHubFromContext(c); hub != nil {

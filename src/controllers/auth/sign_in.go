@@ -5,6 +5,7 @@ import (
 	repositories "gotaskapp/src/repositories/user"
 	"gotaskapp/src/security"
 	"net/http"
+	"time"
 
 	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-gonic/gin"
@@ -59,7 +60,7 @@ func SignIn(c *gin.Context) {
 		return
 	}
 
-	token, err := security.GenerateJwtToken(user.Id)
+	token, err := security.GenerateJwtToken(user.Id, time.Hour*6)
 
 	if err != nil {
 		if hub := sentrygin.GetHubFromContext(c); hub != nil {
