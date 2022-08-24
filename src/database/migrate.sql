@@ -1,0 +1,34 @@
+CREATE DATABASE IF NOT EXISTS gotaskapp;
+
+USE gotaskapp;
+
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS categories;
+DROP TABLE IF EXISTS tasks;
+
+CREATE TABLE users (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    firstname VARCHAR(30) NOT NULL,
+    lastname VARCHAR(30) NOT NULL,
+    email VARCHAR(60) NOT NULL UNIQUE,
+    password VARCHAR(100) NOT NULL,
+    createAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
+)ENGINE=INNODB;
+
+CREATE TABLE categories(
+    id INT PRIMARY KEY AUTO_INCREMENT, 
+    name VARCHAR(30) NOT NULL,
+    user_id INT NOT NULL
+)ENGINE=INNODB;
+
+CREATE TABLE tasks(
+    id INT PRIMARY KEY AUTO_INCREMENT, 
+    description TEXT NOT NULL,
+    user_id INT NOT NULL,
+    category_id INT NOT NULL
+)ENGINE=INNODB;
+
+ALTER TABLE categories ADD FOREIGN KEY (user_id) REFERENCES users (id);
+ALTER TABLE tasks 
+ADD FOREIGN KEY (user_id) REFERENCES users (id),
+ADD FOREIGN KEY (category_id) REFERENCES categories (id);

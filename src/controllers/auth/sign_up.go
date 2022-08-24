@@ -3,14 +3,14 @@ package auth
 import (
 	"gotaskapp/src/database"
 	"gotaskapp/src/entities"
-	"gotaskapp/src/logs"
 	repositories "gotaskapp/src/repositories/user"
 	"net/http"
 
+	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-gonic/gin"
 )
 
-type validate struct {
+type signUp struct {
 	Firstname string `form:"firstname" binding:"required,alpha"`
 	Lastname  string `form:"lastname" binding:"required,alpha"`
 	Email     string `form:"email" binding:"required,email"`
@@ -20,9 +20,9 @@ type validate struct {
 // Sign up
 func SignUp(c *gin.Context) {
 
-	var v validate
+	var form signUp
 
-	if err := c.ShouldBind(&v); err != nil {
+	if err := c.ShouldBind(&form); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -30,7 +30,9 @@ func SignUp(c *gin.Context) {
 	db, err := database.Connect()
 
 	if err != nil {
-		logs.SentryCaptureAndSendException(c, err)
+		if hub := sentrygin.GetHubFromContext(c); hub != nil {
+			hub.CaptureException(err)
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{})
 		return
 	}
@@ -38,16 +40,45 @@ func SignUp(c *gin.Context) {
 	repository := repositories.User(db)
 
 	user := entities.User{
-		Firstname: v.Firstname,
-		Lastname:  v.Lastname,
-		Email:     v.Email,
-		Password:  v.Password,
+		Firstname: form.Firstname,
+		Lastname:  form.Lastname,
+		Email:     form.Email,
+		Password:  form.Password,
+	}
+
+	exists, err := repository.ByEmail(user.Email)
+
+	if err != nil {
+		if hub := sentrygin.GetHubFromContext(c); hub != nil {
+			hub.CaptureException(err)
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{})
+		return
+	}
+
+	if exists != (entities.User{}) {
+		if hub := sentrygin.GetHubFromContext(c); hub != nil {
+			hub.CaptureException(err)
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "there is already an account linked to this email"})
+		return
+	}
+
+	err = user.PasswordToHash()
+
+	if err != nil {
+		if hub := sentrygin.GetHubFromContext(c); hub != nil {
+			hub.CaptureException(err)
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{})
 	}
 
 	id, err := repository.Create(user)
 
 	if err != nil {
-		logs.SentryCaptureAndSendException(c, err)
+		if hub := sentrygin.GetHubFromContext(c); hub != nil {
+			hub.CaptureException(err)
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
