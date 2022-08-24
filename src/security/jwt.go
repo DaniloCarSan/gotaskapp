@@ -13,10 +13,10 @@ import (
 )
 
 // Generate token jwt
-func GenerateJwtToken(id uint64) (string, error) {
+func GenerateJwtToken(id uint64, duration time.Duration) (string, error) {
 	permissions := jwt.MapClaims{}
 	permissions["authorized"] = true
-	permissions["exp"] = time.Now().Add(time.Hour * 6).Unix()
+	permissions["exp"] = time.Now().Add(duration).Unix()
 	permissions["id"] = id
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, permissions)
 	return token.SignedString([]byte(config.JWT_SECRET))
