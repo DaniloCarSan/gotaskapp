@@ -10,9 +10,9 @@ services:
       MYSQL_ROOT_HOST: "%"
       MYSQL_DATABASE: "${DB_NAME}"
       MYSQL_PASSWORD: "${DB_PASS}"
-      MYSQL_USER: "${DB_USER}"
-      MYSQL_ROOT_PASSWORD: "${DB_PASS}"
+      MARIADB_ROOT_PASSWORD: "${DB_PASS}"
     volumes:
+      - './docker/mysql/scripts/migrate.sql:/docker-entrypoint-initdb.d/migrate.sql'
       - 'database:/var/lib/mysql'
 volumes:
   database:
