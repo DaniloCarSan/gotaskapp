@@ -25,7 +25,11 @@ func GenerateJwtToken(id uint64) (string, error) {
 // Validate jwt token
 func ValidateJwtToken(r *http.Request) error {
 
-	tokenString := extractJwtToken(r)
+	tokenString, err := extractJwtToken(r)
+
+	if err != nil {
+		return err
+	}
 
 	token, err := jwt.Parse(tokenString, funcSecretJwtKeyVerifySignature)
 
@@ -40,28 +44,32 @@ func ValidateJwtToken(r *http.Request) error {
 	return errors.New("token invalid")
 }
 
-func extractJwtToken(r *http.Request) string {
+func extractJwtToken(r *http.Request) (string, error) {
 	token := r.Header.Get("Authorization")
 
-	if len(strings.Split(token, " ")) == 2 {
-		return strings.Split(token, " ")[1]
+	if len(strings.Split(token, " ")) != 2 {
+		return "", errors.New("bearer or token not found in authorization")
 	}
 
-	return ""
+	return strings.Split(token, " ")[1], nil
 }
 
 func funcSecretJwtKeyVerifySignature(token *jwt.Token) (interface{}, error) {
 
 	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-		return nil, fmt.Errorf("method of signature unexpected  %v", token.Header["alg"])
+		return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 	}
 
-	return config.JWT_SECRET, nil
+	return []byte(config.JWT_SECRET), nil
 }
 
 func ExtractUserIdOfJwtToken(r *http.Request) (uint64, error) {
 
-	tokenString := extractJwtToken(r)
+	tokenString, err := extractJwtToken(r)
+
+	if err != nil {
+		return 0, err
+	}
 
 	token, err := jwt.Parse(tokenString, funcSecretJwtKeyVerifySignature)
 
