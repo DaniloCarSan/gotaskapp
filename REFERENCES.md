@@ -6,10 +6,15 @@ referente a solução de problemas e configuração de recursos.
 ## Documentação
 
 [Configurar o Gin](https://github.com/gin-gonic/gin)
+
 [Configurar o Github actions para Golang](https://docs.github.com/pt/actions/automating-builds-and-tests/building-and-testing-go)
+
 [Como configurar o sentry no projeto](https://docs.sentry.io/platforms/go/guides/http/)
+
 [Configurar um middleware no Gin](https://sosedoff.com/2014/12/21/gin-middleware.html)
+
 [Configurar live reload para Go apps com AIR](https://github.com/cosmtrek/air)
+
 [Configurar modulo JWT](https://github.com/golang-jwt/jwt)
 
 
