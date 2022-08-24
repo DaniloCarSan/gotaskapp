@@ -2,6 +2,7 @@ package entities
 
 import (
 	"gotaskapp/src/security"
+	"strings"
 	"time"
 )
 
@@ -11,9 +12,11 @@ type User struct {
 	Lastname  string    `json:"lastname,omitempty"`
 	Email     string    `json:"email,omitempty"`
 	Password  string    `json:"-"`
-	CreateAt  time.Time `json:"-"`
+	Verified  string    `json:"verified"`
+	CreateAt  time.Time `json:"create_at,omitempty"`
 }
 
+// Convert password to hash
 func (u *User) PasswordToHash() error {
 	hash, err := security.PasswordToHash(u.Password)
 
@@ -24,4 +27,9 @@ func (u *User) PasswordToHash() error {
 	u.Password = string(hash)
 
 	return nil
+}
+
+// Verify if email is verified
+func (u *User) IsEmailVerified() bool {
+	return strings.EqualFold(u.Verified, "Y")
 }

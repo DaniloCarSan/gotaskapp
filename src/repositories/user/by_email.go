@@ -28,6 +28,7 @@ func (repository *user) ByEmail(email string) (entities.User, error) {
 		&user.Lastname,
 		&user.Email,
 		&user.Password,
+		&user.Verified,
 		&user.CreateAt,
 	)
 
