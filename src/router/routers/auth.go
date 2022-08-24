@@ -15,6 +15,7 @@ func Auth(app *gin.Engine) {
 		authGroup.POST("/sign/in", authController.SignIn)
 		authGroup.GET("/email/verify/:token", authController.EmailVerify)
 		authGroup.POST("/password/reset", authController.PasswordReset)
+		authGroup.POST("/request/password/reset", authController.RequestPasswordReset)
 		authGroup.POST("/{:id}/token/renew", middlewares.Authenticate(), authController.TokenRenew)
 	}
 }
