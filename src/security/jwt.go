@@ -23,28 +23,22 @@ func GenerateJwtToken(id uint64) (string, error) {
 }
 
 // Validate jwt token
-func ValidateJwtToken(r *http.Request) error {
-
-	tokenString, err := extractJwtToken(r)
-
-	if err != nil {
-		return err
-	}
+func ValidateJwtToken(tokenString string) (*jwt.Token, error) {
 
 	token, err := jwt.Parse(tokenString, funcSecretJwtKeyVerifySignature)
 
 	if err != nil {
-		return err
+		return &jwt.Token{}, err
 	}
 
 	if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		return nil
+		return token, nil
 	}
 
-	return errors.New("token invalid")
+	return &jwt.Token{}, errors.New("token invalid")
 }
 
-func extractJwtToken(r *http.Request) (string, error) {
+func ExtractJwtTokenFromHeaderAuthorization(r *http.Request) (string, error) {
 	token := r.Header.Get("Authorization")
 
 	if len(strings.Split(token, " ")) != 2 {
@@ -63,28 +57,15 @@ func funcSecretJwtKeyVerifySignature(token *jwt.Token) (interface{}, error) {
 	return []byte(config.JWT_SECRET), nil
 }
 
-func ExtractUserIdOfJwtToken(r *http.Request) (uint64, error) {
+func ExtractUserIdOfJwtToken(token *jwt.Token) (uint64, error) {
 
-	tokenString, err := extractJwtToken(r)
+	permissions, _ := token.Claims.(jwt.MapClaims)
 
-	if err != nil {
-		return 0, err
-	}
-
-	token, err := jwt.Parse(tokenString, funcSecretJwtKeyVerifySignature)
+	id, err := strconv.ParseUint(fmt.Sprintf("%.0f", permissions["id"]), 10, 64)
 
 	if err != nil {
 		return 0, err
 	}
 
-	if permissions, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		id, err := strconv.ParseUint(fmt.Sprintf("%.0f", permissions["id"]), 10, 64)
-		if err != nil {
-			return 0, err
-		}
-
-		return id, nil
-	}
-
-	return 0, errors.New("token invalid")
+	return id, nil
 }
