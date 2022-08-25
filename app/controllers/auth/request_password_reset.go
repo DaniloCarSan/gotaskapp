@@ -18,12 +18,12 @@ var emailRequestPasswordResetbody = `
 <html>
 <head>
    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-   <title>Link de redefinição de senha</title>
+   <title>Password reset</title>
 </head>
 <body>
-   <p>Lin de redefinição de senha do <b>Go TaskApp</b></p>
-   <p>Clique neste link <a href="{{LINK}}">aqui</a> para redefinir a senha.</p>
-   <p>Caso não tenha requisitado este link ignore.</p>
+   <p>Password reset link <b>Go TaskApp</b></p>
+   <p>Click this link <a href="{{LINK}}">here</a> to reset your password.</p>
+   <p>If you have not requested this link, ignore it.</p>
 </body>
 `
 
@@ -73,9 +73,9 @@ func RequestPasswordReset(c *gin.Context) {
 
 	link := fmt.Sprintf("http://%s%s%s", config.APP_HOST_FULL, "/password/reset/", token)
 
-	emailSignUpbody = strings.ReplaceAll(emailSignUpbody, "{{LINK}}", link)
+	emailRequestPasswordResetbody = strings.ReplaceAll(emailRequestPasswordResetbody, "{{LINK}}", link)
 
-	err = helpers.SendEmail([]string{user.Email}, []string{}, "Redefinição de senha", emailSignUpbody)
+	err = helpers.SendEmail([]string{user.Email}, []string{}, "Password Reset", emailRequestPasswordResetbody)
 
 	if err != nil {
 		if hub := sentrygin.GetHubFromContext(c); hub != nil {
@@ -86,6 +86,6 @@ func RequestPasswordReset(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Um link de redefinição de senha foi enviado para seu email, aso não esteja em sua caixa de entrada verifique a de span.",
+		"message": "A password reset link has been sent to your email, if it's not in your inbox check your span.",
 	})
 }
