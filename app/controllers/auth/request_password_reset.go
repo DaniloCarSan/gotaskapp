@@ -71,7 +71,7 @@ func RequestPasswordReset(c *gin.Context) {
 		return
 	}
 
-	link := fmt.Sprintf("http://%s%s%s", config.APP_HOST_FULL, "/password/reset/", token)
+	link := fmt.Sprintf("http://%s%s%s", config.APP_HOST_FULL, "/auth/password/reset/", token)
 
 	emailRequestPasswordResetbody = strings.ReplaceAll(emailRequestPasswordResetbody, "{{LINK}}", link)
 

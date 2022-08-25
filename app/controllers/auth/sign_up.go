@@ -87,6 +87,7 @@ func SignUp(c *gin.Context) {
 			hub.CaptureException(err)
 		}
 		c.JSON(http.StatusInternalServerError, gin.H{})
+		return
 	}
 
 	id, err := repository.User.Create(user)
