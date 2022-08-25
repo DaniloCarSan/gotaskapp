@@ -49,7 +49,7 @@ func EmailVerify(c *gin.Context) {
 		return
 	}
 
-	if user.IsEmailVerified() {
+	if !user.IsEmailVerified() {
 
 		if err := repository.User.SetEmailVerified(id); err != nil {
 			if hub := sentrygin.GetHubFromContext(c); hub != nil {
