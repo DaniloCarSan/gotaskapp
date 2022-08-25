@@ -1,9 +1,9 @@
 package auth
 
 import (
-	"gotaskapp/src/database"
-	"gotaskapp/src/entities"
-	"gotaskapp/src/security"
+	"gotaskapp/app/database"
+	"gotaskapp/app/entities"
+	"gotaskapp/app/security"
 	"net/http"
 
 	sentrygin "github.com/getsentry/sentry-go/gin"

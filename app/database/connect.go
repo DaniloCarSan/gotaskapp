@@ -3,8 +3,8 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"gotaskapp/src/config"
-	repositoryUser "gotaskapp/src/repositories/user"
+	"gotaskapp/app/config"
+	repositoryUser "gotaskapp/app/repositories/user"
 
 	_ "github.com/go-sql-driver/mysql"
 )

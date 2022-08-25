@@ -1,8 +1,8 @@
 package auth
 
 import (
-	"gotaskapp/src/database"
-	"gotaskapp/src/security"
+	"gotaskapp/app/database"
+	"gotaskapp/app/security"
 	"net/http"
 	"time"
 

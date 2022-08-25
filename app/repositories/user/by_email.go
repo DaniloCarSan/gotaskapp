@@ -1,13 +1,13 @@
 package user
 
-import "gotaskapp/src/entities"
+import "gotaskapp/app/entities"
 
-// ByID
-func (r *Repository) ById(id uint64) (entities.User, error) {
+// Select a user by email
+func (r *Repository) ByEmail(email string) (entities.User, error) {
 
 	rows, err := r.DB.Query(
-		"SELECT * FROM users WHERE id = ? LIMIT 1",
-		id,
+		"SELECT * FROM users WHERE email = ? LIMIT 1",
+		email,
 	)
 
 	if err != nil {

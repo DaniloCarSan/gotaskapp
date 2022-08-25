@@ -2,11 +2,11 @@ package auth
 
 import (
 	"fmt"
-	"gotaskapp/src/config"
-	"gotaskapp/src/database"
-	"gotaskapp/src/entities"
-	"gotaskapp/src/helpers"
-	"gotaskapp/src/security"
+	"gotaskapp/app/config"
+	"gotaskapp/app/database"
+	"gotaskapp/app/entities"
+	"gotaskapp/app/helpers"
+	"gotaskapp/app/security"
 	"net/http"
 	"strings"
 	"time"

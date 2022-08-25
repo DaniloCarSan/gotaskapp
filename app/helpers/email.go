@@ -1,7 +1,7 @@
 package helpers
 
 import (
-	"gotaskapp/src/config"
+	"gotaskapp/app/config"
 
 	mail "github.com/xhit/go-simple-mail/v2"
 )

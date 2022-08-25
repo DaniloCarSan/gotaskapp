@@ -1,6 +1,6 @@
 package user
 
-import "gotaskapp/src/entities"
+import "gotaskapp/app/entities"
 
 // Create a new user
 func (r *Repository) Create(user entities.User) (uint64, error) {

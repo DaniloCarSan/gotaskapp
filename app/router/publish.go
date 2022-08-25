@@ -1,7 +1,7 @@
 package router
 
 import (
-	"gotaskapp/src/router/routers"
+	"gotaskapp/app/router/routers"
 
 	"github.com/gin-gonic/gin"
 )

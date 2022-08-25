@@ -1,7 +1,7 @@
 package entities
 
 import (
-	"gotaskapp/src/security"
+	"gotaskapp/app/security"
 	"strings"
 	"time"
 )

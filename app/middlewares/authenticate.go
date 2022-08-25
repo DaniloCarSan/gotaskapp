@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"gotaskapp/src/security"
+	"gotaskapp/app/security"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

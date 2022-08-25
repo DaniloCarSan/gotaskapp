@@ -1,8 +1,8 @@
 package routers
 
 import (
-	taskController "gotaskapp/src/controllers/task"
-	"gotaskapp/src/middlewares"
+	taskController "gotaskapp/app/controllers/task"
+	"gotaskapp/app/middlewares"
 
 	"github.com/gin-gonic/gin"
 )

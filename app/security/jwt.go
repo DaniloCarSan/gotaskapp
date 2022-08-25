@@ -3,7 +3,7 @@ package security
 import (
 	"errors"
 	"fmt"
-	"gotaskapp/src/config"
+	"gotaskapp/app/config"
 	"net/http"
 	"strconv"
 	"strings"

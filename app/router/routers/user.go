@@ -1,8 +1,8 @@
 package routers
 
 import (
-	userController "gotaskapp/src/controllers/user"
-	"gotaskapp/src/middlewares"
+	userController "gotaskapp/app/controllers/user"
+	"gotaskapp/app/middlewares"
 
 	"github.com/gin-gonic/gin"
 )
