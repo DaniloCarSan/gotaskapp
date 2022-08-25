@@ -5,7 +5,6 @@ import (
 	"gotaskapp/src/config"
 	"gotaskapp/src/database"
 	"gotaskapp/src/helpers"
-	repositories "gotaskapp/src/repositories/user"
 	"gotaskapp/src/security"
 	"net/http"
 	"strings"
@@ -42,7 +41,7 @@ func RequestPasswordReset(c *gin.Context) {
 		return
 	}
 
-	db, err := database.Connect()
+	repository, err := database.Repository()
 
 	if err != nil {
 		if hub := sentrygin.GetHubFromContext(c); hub != nil {
@@ -52,9 +51,7 @@ func RequestPasswordReset(c *gin.Context) {
 		return
 	}
 
-	repository := repositories.User(db)
-
-	user, err := repository.ByEmail(form.Email)
+	user, err := repository.User.ByEmail(form.Email)
 
 	if err != nil {
 		if hub := sentrygin.GetHubFromContext(c); hub != nil {

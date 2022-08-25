@@ -1,9 +1,9 @@
 package user
 
 //  Set email verified
-func (repository *user) SetEmailVerified(id uint64) error {
+func (r *Repository) SetEmailVerified(id uint64) error {
 
-	stmt, err := repository.db.Prepare(
+	stmt, err := r.DB.Prepare(
 		`UPDATE users SET verified = "Y" WHERE id = ?`,
 	)
 

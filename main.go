@@ -1,8 +1,8 @@
 package main
 
 import (
-	"gotaskapp/src/config"
-	"gotaskapp/src/router"
+	"gotaskapp/api/config"
+	"gotaskapp/api/router"
 	"log"
 	"time"
 

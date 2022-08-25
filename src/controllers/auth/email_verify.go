@@ -3,7 +3,6 @@ package auth
 import (
 	"gotaskapp/src/database"
 	"gotaskapp/src/entities"
-	repositories "gotaskapp/src/repositories/user"
 	"gotaskapp/src/security"
 	"net/http"
 
@@ -35,7 +34,7 @@ func EmailVerify(c *gin.Context) {
 		return
 	}
 
-	db, err := database.Connect()
+	repository, err := database.Repository()
 
 	if err != nil {
 		if hub := sentrygin.GetHubFromContext(c); hub != nil {
@@ -45,16 +44,14 @@ func EmailVerify(c *gin.Context) {
 		return
 	}
 
-	repository := repositories.User(db)
-
-	if user, err = repository.ById(id); err != nil {
+	if user, err = repository.User.ById(id); err != nil {
 		c.JSON(http.StatusUnauthorized, "Error, invalid confirmation token or it has expired, request another")
 		return
 	}
 
 	if user.IsEmailVerified() {
 
-		if err := repository.SetEmailVerified(id); err != nil {
+		if err := repository.User.SetEmailVerified(id); err != nil {
 			if hub := sentrygin.GetHubFromContext(c); hub != nil {
 				hub.CaptureException(err)
 			}

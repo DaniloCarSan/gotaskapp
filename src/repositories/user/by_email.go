@@ -3,9 +3,9 @@ package user
 import "gotaskapp/src/entities"
 
 // Select a user by email
-func (repository *user) ByEmail(email string) (entities.User, error) {
+func (r *Repository) ByEmail(email string) (entities.User, error) {
 
-	rows, err := repository.db.Query(
+	rows, err := r.DB.Query(
 		"SELECT * FROM users WHERE email = ? LIMIT 1",
 		email,
 	)

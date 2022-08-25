@@ -3,9 +3,9 @@ package user
 import "gotaskapp/src/entities"
 
 // ByID
-func (repository *user) ById(id uint64) (entities.User, error) {
+func (r *Repository) ById(id uint64) (entities.User, error) {
 
-	rows, err := repository.db.Query(
+	rows, err := r.DB.Query(
 		"SELECT * FROM users WHERE id = ? LIMIT 1",
 		id,
 	)

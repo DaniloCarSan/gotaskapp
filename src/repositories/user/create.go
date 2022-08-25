@@ -3,9 +3,9 @@ package user
 import "gotaskapp/src/entities"
 
 // Create a new user
-func (repository *user) Create(user entities.User) (uint64, error) {
+func (r *Repository) Create(user entities.User) (uint64, error) {
 
-	stmt, err := repository.db.Prepare(
+	stmt, err := r.DB.Prepare(
 		"INSERT INTO users (firstname,lastname,email,password)VALUES(?,?,?,?)",
 	)
 

@@ -6,7 +6,6 @@ import (
 	"gotaskapp/src/database"
 	"gotaskapp/src/entities"
 	"gotaskapp/src/helpers"
-	repositories "gotaskapp/src/repositories/user"
 	"gotaskapp/src/security"
 	"net/http"
 	"strings"
@@ -46,7 +45,7 @@ func SignUp(c *gin.Context) {
 		return
 	}
 
-	db, err := database.Connect()
+	repository, err := database.Repository()
 
 	if err != nil {
 		if hub := sentrygin.GetHubFromContext(c); hub != nil {
@@ -56,8 +55,6 @@ func SignUp(c *gin.Context) {
 		return
 	}
 
-	repository := repositories.User(db)
-
 	user := entities.User{
 		Firstname: form.Firstname,
 		Lastname:  form.Lastname,
@@ -65,7 +62,7 @@ func SignUp(c *gin.Context) {
 		Password:  form.Password,
 	}
 
-	exists, err := repository.ByEmail(user.Email)
+	exists, err := repository.User.ByEmail(user.Email)
 
 	if err != nil {
 		if hub := sentrygin.GetHubFromContext(c); hub != nil {
@@ -92,7 +89,7 @@ func SignUp(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{})
 	}
 
-	id, err := repository.Create(user)
+	id, err := repository.User.Create(user)
 
 	if err != nil {
 		if hub := sentrygin.GetHubFromContext(c); hub != nil {
