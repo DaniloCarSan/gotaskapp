@@ -17,6 +17,10 @@ referente a solução de problemas e configuração de recursos.
 
 [Configurar modulo JWT](https://github.com/golang-jwt/jwt)
 
+[Criando um clone do reddit](https://course.gowebexamples.com/course/creating-a-reddit-clone-in-go/serving-html-with-chi-router)
+
+[Layout de projetos](https://github.com/golang-standards/project-layout/blob/master/README_ptBR.md)
+
 
 ## Solução de problemas
 [Problema na migração do banco quando o container do banco é iniciado](https://stackoverflow.com/questions/62922399/docker-compose-mariadb-docker-entrypoint-initdb-d-sql-is-not-executed/67435932#67435932)
