@@ -11,7 +11,6 @@ habilidades nas ferramentas utilizadas para a contrução desta aplicação.
   - Registrar-se 
   - Login 
   - Resetar senha
-  - Renover token
 
 :busts_in_silhouette: **Usuário**
   - Criar usuário
