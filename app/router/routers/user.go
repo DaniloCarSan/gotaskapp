@@ -11,7 +11,7 @@ import (
 func User(app *gin.Engine) {
 	usersGroup := app.Group("/users", middlewares.Authenticate())
 	{
-		usersGroup.GET("", userController.Select)
+		usersGroup.GET("", userController.ByToken)
 		usersGroup.PUT("", userController.Update)
 	}
 }
