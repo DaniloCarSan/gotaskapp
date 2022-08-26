@@ -69,3 +69,26 @@ func ExtractUserIdOfJwtToken(token *jwt.Token) (uint64, error) {
 
 	return id, nil
 }
+
+func ExtractUserIfOFJwtTokenFromHeaderAuthorization(r *http.Request) (uint64, error) {
+
+	var tokenString string
+	var err error
+	var token *jwt.Token
+
+	if tokenString, err = ExtractJwtTokenFromHeaderAuthorization(r); err != nil {
+		return 0, err
+	}
+
+	if token, err = ValidateJwtToken(tokenString); err != nil {
+		return 0, err
+	}
+
+	var id uint64
+
+	if id, err = ExtractUserIdOfJwtToken(token); err != nil {
+		return 0, err
+	}
+
+	return id, err
+}
