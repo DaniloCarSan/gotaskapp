@@ -23,7 +23,7 @@ func (r *Repository) ById(id uint64) (entities.User, error) {
 	var user entities.User
 
 	err = rows.Scan(
-		&user.Id,
+		&user.ID,
 		&user.Firstname,
 		&user.Lastname,
 		&user.Email,

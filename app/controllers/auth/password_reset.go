@@ -80,7 +80,7 @@ func PasswordReset(c *gin.Context) {
 		return
 	}
 
-	err = repository.User.PasswordReset(user.Id, user.Password)
+	err = repository.User.PasswordReset(user.ID, user.Password)
 
 	if err != nil {
 		if hub := sentrygin.GetHubFromContext(c); hub != nil {

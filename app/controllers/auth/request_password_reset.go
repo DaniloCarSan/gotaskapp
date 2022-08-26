@@ -61,7 +61,7 @@ func RequestPasswordReset(c *gin.Context) {
 		return
 	}
 
-	token, err := security.GenerateJwtToken(user.Id, time.Hour*6)
+	token, err := security.GenerateJwtToken(user.ID, time.Hour*6)
 
 	if err != nil {
 		if hub := sentrygin.GetHubFromContext(c); hub != nil {

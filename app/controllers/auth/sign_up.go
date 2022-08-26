@@ -100,9 +100,9 @@ func SignUp(c *gin.Context) {
 		return
 	}
 
-	user.Id = id
+	user.ID = id
 
-	token, err := security.GenerateJwtToken(user.Id, time.Hour*6)
+	token, err := security.GenerateJwtToken(user.ID, time.Hour*6)
 
 	if err != nil {
 		if hub := sentrygin.GetHubFromContext(c); hub != nil {

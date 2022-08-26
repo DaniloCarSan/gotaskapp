@@ -7,13 +7,13 @@ import (
 )
 
 type User struct {
-	Id        uint64    `json:"id,omitempty"`
+	ID        uint64    `json:"id,omitempty"`
 	Firstname string    `json:"firstname,omitempty"`
 	Lastname  string    `json:"lastname,omitempty"`
 	Email     string    `json:"email,omitempty"`
 	Password  string    `json:"-"`
 	Verified  string    `json:"verified"`
-	CreateAt  time.Time `json:"create_at,omitempty"`
+	CreateAt  time.Time `json:"-"`
 }
 
 // Convert password to hash
