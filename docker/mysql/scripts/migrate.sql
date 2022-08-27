@@ -29,11 +29,10 @@ CREATE TABLE IF NOT EXISTS  tasks(
     status_id INT NOT NULL
 )ENGINE=INNODB;
 
-ALTER TABLE status ADD FOREIGN KEY (user_id) REFERENCES users (id);
+ALTER TABLE status ADD FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE;
 ALTER TABLE tasks 
 ADD FOREIGN KEY (user_id) REFERENCES users (id),
-ADD FOREIGN KEY (status_id) REFERENCES status (id);
-
+ADD FOREIGN KEY (status_id) REFERENCES status (id) ON DELETE CASCADE;
 
 INSERT INTO users (firstname, lastname, email, password,verified)
 -- password: 123456
