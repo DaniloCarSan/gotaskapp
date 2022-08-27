@@ -72,11 +72,11 @@ func SignUp(c *gin.Context) {
 		return
 	}
 
-	if exists != (entities.User{}) {
+	if exists.ID > 0 {
 		if hub := sentrygin.GetHubFromContext(c); hub != nil {
 			hub.CaptureException(err)
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "there is already an account linked to this email"})
+		c.JSON(http.StatusConflict, gin.H{"error": "there is already an account linked to this email"})
 		return
 	}
 
@@ -96,7 +96,7 @@ func SignUp(c *gin.Context) {
 		if hub := sentrygin.GetHubFromContext(c); hub != nil {
 			hub.CaptureException(err)
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{})
 		return
 	}
 
@@ -122,7 +122,7 @@ func SignUp(c *gin.Context) {
 		if hub := sentrygin.GetHubFromContext(c); hub != nil {
 			hub.CaptureException(err)
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{})
 		return
 	}
 

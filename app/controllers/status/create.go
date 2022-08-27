@@ -55,12 +55,12 @@ func Create(c *gin.Context) {
 		if hub := sentrygin.GetHubFromContext(c); hub != nil {
 			hub.CaptureException(err)
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{})
 		return
 	}
 
 	if exists.ID > 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Status already exists"})
+		c.JSON(http.StatusConflict, gin.H{"error": "Status already exists"})
 		return
 	}
 
@@ -68,9 +68,9 @@ func Create(c *gin.Context) {
 		if hub := sentrygin.GetHubFromContext(c); hub != nil {
 			hub.CaptureException(err)
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{})
 		return
 	}
 
-	c.JSON(http.StatusOK, status)
+	c.JSON(http.StatusCreated, status)
 }
