@@ -44,7 +44,7 @@ func All(c *gin.Context) {
 	}
 
 	if len(status) == 0 {
-		c.JSON(http.StatusNotFound, []entities.Status{})
+		c.JSON(http.StatusOK, []entities.Status{})
 		return
 	}
 
