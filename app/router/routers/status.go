@@ -12,5 +12,6 @@ func Status(app *gin.Engine) {
 	statusGroup := app.Group("/status", middlewares.Authenticate())
 	{
 		statusGroup.POST("", statusController.Create)
+		statusGroup.GET("", statusController.All)
 	}
 }
