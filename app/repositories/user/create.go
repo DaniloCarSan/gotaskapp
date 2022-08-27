@@ -6,7 +6,7 @@ import "gotaskapp/app/entities"
 func (r *Repository) Create(user entities.User) (uint64, error) {
 
 	stmt, err := r.DB.Prepare(
-		"INSERT INTO users (firstname,lastname,email,password)VALUES(?,?,?,?)",
+		"INSERT INTO users (firstname,lastname,email,password)VALUES(?, ?, ?, ?)",
 	)
 
 	if err != nil {
@@ -15,7 +15,12 @@ func (r *Repository) Create(user entities.User) (uint64, error) {
 
 	defer stmt.Close()
 
-	result, err := stmt.Exec(user.Firstname, user.Lastname, user.Email, user.Password)
+	result, err := stmt.Exec(
+		user.Firstname,
+		user.Lastname,
+		user.Email,
+		user.Password,
+	)
 
 	if err != nil {
 		return 0, err

@@ -6,7 +6,7 @@ import "gotaskapp/app/entities"
 func (r *Repository) Update(user entities.User) error {
 
 	stmt, err := r.DB.Prepare(
-		`UPDATE users SET firstname = ?, lastname = ? WHERE id = ?`,
+		`UPDATE users SET firstname = ?, lastname = ? WHERE id = ? LIMI 1`,
 	)
 
 	if err != nil {
@@ -15,7 +15,11 @@ func (r *Repository) Update(user entities.User) error {
 
 	defer stmt.Close()
 
-	_, err = stmt.Exec(user.Firstname, user.Lastname, user.ID)
+	_, err = stmt.Exec(
+		user.Firstname,
+		user.Lastname,
+		user.ID,
+	)
 
 	if err != nil {
 		return err

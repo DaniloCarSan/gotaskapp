@@ -4,7 +4,7 @@ package user
 func (r *Repository) PasswordReset(id uint64, password string) error {
 
 	stmt, err := r.DB.Prepare(
-		`UPDATE users SET verified = "Y", password = ? WHERE id = ?`,
+		`UPDATE users SET verified = "Y", password = ? WHERE id = ? LIMIT 1`,
 	)
 
 	if err != nil {
@@ -13,7 +13,10 @@ func (r *Repository) PasswordReset(id uint64, password string) error {
 
 	defer stmt.Close()
 
-	_, err = stmt.Exec(password, id)
+	_, err = stmt.Exec(
+		password,
+		id,
+	)
 
 	if err != nil {
 		return err
