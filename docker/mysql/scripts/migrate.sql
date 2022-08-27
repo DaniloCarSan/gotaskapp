@@ -26,10 +26,10 @@ CREATE TABLE IF NOT EXISTS  tasks(
     id INT PRIMARY KEY AUTO_INCREMENT, 
     description TEXT NOT NULL,
     user_id INT NOT NULL,
-    category_id INT NOT NULL
+    status_id INT NOT NULL
 )ENGINE=INNODB;
 
 ALTER TABLE status ADD FOREIGN KEY (user_id) REFERENCES users (id);
 ALTER TABLE tasks 
 ADD FOREIGN KEY (user_id) REFERENCES users (id),
-ADD FOREIGN KEY (category_id) REFERENCES status (id);
+ADD FOREIGN KEY (status_id) REFERENCES status (id);

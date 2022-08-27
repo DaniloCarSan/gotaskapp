@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gotaskapp/app/config"
 	repositoryStatus "gotaskapp/app/repositories/status"
+	repositoryTask "gotaskapp/app/repositories/task"
 	repositoryUser "gotaskapp/app/repositories/user"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -25,10 +26,12 @@ func Repository() (*repository, error) {
 	return &repository{
 		User:   &repositoryUser.Repository{DB: db},
 		Status: &repositoryStatus.Repository{DB: db},
+		Task:   &repositoryTask.Repository{DB: db},
 	}, nil
 }
 
 type repository struct {
 	User   *repositoryUser.Repository
 	Status *repositoryStatus.Repository
+	Task   *repositoryTask.Repository
 }
