@@ -16,6 +16,5 @@ func Task(app *gin.Engine) {
 		taskGroup.GET("/:id", taskController.Select)
 		taskGroup.PUT("", taskController.Update)
 		taskGroup.DELETE("/:id", taskController.Delete)
-		taskGroup.PATCH("/toggle/done/{id}", taskController.Done)
 	}
 }
