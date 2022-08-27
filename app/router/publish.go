@@ -11,6 +11,7 @@ func LoadRouters(app *gin.Engine) *gin.Engine {
 
 	routers.Auth(app)
 	routers.User(app)
+	routers.Status(app)
 	routers.Task(app)
 
 	return app
