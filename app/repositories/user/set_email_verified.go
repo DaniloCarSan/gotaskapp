@@ -4,7 +4,7 @@ package user
 func (r *Repository) SetEmailVerified(id uint64) error {
 
 	stmt, err := r.DB.Prepare(
-		`UPDATE users SET verified = "Y" WHERE id = ?`,
+		`UPDATE users SET verified = "Y" WHERE id = ? LIMIT 1`,
 	)
 
 	if err != nil {
