@@ -15,10 +15,6 @@ func (r *Repository) ByUserID(userID uint64) ([]entities.Status, error) {
 
 	defer rows.Close()
 
-	if !rows.Next() {
-		return status, nil
-	}
-
 	for rows.Next() {
 
 		var s entities.Status
