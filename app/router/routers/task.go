@@ -12,7 +12,7 @@ func Task(app *gin.Engine) {
 	taskGroup := app.Group("/tasks", middlewares.Authenticate())
 	{
 		taskGroup.POST("", taskController.Create)
-		taskGroup.GET("", taskController.All)
+		taskGroup.GET("/status/:id", taskController.All)
 		taskGroup.GET("/:id", taskController.Select)
 		taskGroup.PUT("", taskController.Update)
 		taskGroup.DELETE("/:id", taskController.Delete)
