@@ -13,8 +13,7 @@ func Task(app *gin.Engine) {
 	{
 		taskGroup.POST("", taskController.Create)
 		taskGroup.GET("/status/:id", taskController.All)
-		taskGroup.GET("/:id", taskController.Select)
-		taskGroup.PUT("", taskController.Update)
+		taskGroup.PUT("/:id", taskController.Update)
 		taskGroup.DELETE("/:id", taskController.Delete)
 	}
 }
