@@ -51,21 +51,6 @@ func Create(c *gin.Context) {
 		UserID:      userID,
 	}
 
-	exists, err := repository.Task.ByDescriptionAndUserIDAndStatusID(task.Description, task.UserID, task.StatusID)
-
-	if err != nil {
-		if hub := sentrygin.GetHubFromContext(c); hub != nil {
-			hub.CaptureException(err)
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	if exists.ID != 0 {
-		c.JSON(http.StatusConflict, gin.H{"error": "Task already exists"})
-		return
-	}
-
 	id, err := repository.Task.Create(task)
 
 	if err != nil {
