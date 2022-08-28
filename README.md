@@ -8,22 +8,27 @@ habilidades nas ferramentas utilizadas para a contrução desta aplicação.
 ## :open_file_folder: FUNCIONALIDADES
 
 :closed_lock_with_key: **Autenticação**
-  - Registrar-se 
+  - Registrar-se
   - Login 
-  - Resetar senha
+  - Verificação de email
+  - Redefinição de senha
 
 :busts_in_silhouette: **Usuário**
-  - Criar usuário
   - Editar usuário
   - Selecionar usuário
 
 :ballot_box_with_check: **Tarefa**
   - Criar tarefa
-  - Selecionar tarefa
   - Editar tarefa
   - Excluir tarefa
-  - Listar tarefas
-  - Concluir tarefa
+  - Listar tarefas por status
+  - Alterar status da tarefa
+
+:books: **Status**
+  - Criar status
+  - Editar status
+  - Excluir status
+  - Listar od status
 
 ## :hammer: FERRAMENTAS E TECNOLOGIAS UTILIZADAS
 
@@ -31,7 +36,9 @@ habilidades nas ferramentas utilizadas para a contrução desta aplicação.
 - GOLANG
 - GIT
 - GITHUB
+- MYSQL DATABASE
 - MYSQL WORKBENCH
 - NOTION
 - THUNDER CLIENT FOR VSCODE
+- INSOMNIA
 - VS CODE
