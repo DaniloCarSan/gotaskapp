@@ -11,7 +11,7 @@ Todas as mudanças notáveis ​​neste projeto serão documentadas neste arqui
 
 ### :pencil: Histórico de lançamento
 
-## [v1.0.0] - 28/08/2022
+#### [v1.0.0] - 28/08/2022
 
   - Registrar-se
   - Login 
