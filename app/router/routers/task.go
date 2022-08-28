@@ -15,5 +15,6 @@ func Task(app *gin.Engine) {
 		taskGroup.GET("/status/:id", taskController.All)
 		taskGroup.PUT("/:id", taskController.Update)
 		taskGroup.DELETE("/:id", taskController.Delete)
+		taskGroup.PATCH("/:task_id/status/:status_id", taskController.ChangeStatus)
 	}
 }
