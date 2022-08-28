@@ -13,7 +13,6 @@ Todas as mudanças notáveis ​​neste projeto serão documentadas neste arqui
 
 ## [v1.0.0] - 28/08/2022
 
-**Autenticação**
   - Registrar-se
   - Login 
   - Verificação de email
