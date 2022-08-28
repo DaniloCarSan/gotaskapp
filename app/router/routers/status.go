@@ -14,6 +14,6 @@ func Status(app *gin.Engine) {
 		statusGroup.POST("", statusController.Create)
 		statusGroup.GET("", statusController.All)
 		statusGroup.PUT("", statusController.Update)
-		statusGroup.DELETE("", statusController.Delete)
+		statusGroup.DELETE("/:id", statusController.Delete)
 	}
 }
