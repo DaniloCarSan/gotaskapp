@@ -4,27 +4,25 @@ import (
 	"gotaskapp/app/database"
 	"gotaskapp/app/security"
 	"net/http"
+	"strconv"
 
 	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-gonic/gin"
 )
 
-type Validate struct {
-	ID uint64 `form:"id" binding:"required"`
-}
-
 // Delete status by id
 func Delete(c *gin.Context) {
 
-	var form Validate
-
-	if err := c.ShouldBind(&form); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
+	var statusID uint64
 	var userID uint64
 	var err error
+
+	statusID, err = strconv.ParseUint(c.Param("id"), 10, 64)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid status ID"})
+		return
+	}
 
 	userID, err = security.ExtractUserIfOFJwtTokenFromHeaderAuthorization(c.Request)
 
@@ -43,7 +41,7 @@ func Delete(c *gin.Context) {
 		return
 	}
 
-	exists, err := repository.Status.ByID(form.ID)
+	exists, err := repository.Status.ByID(statusID)
 
 	if err != nil {
 		if hub := sentrygin.GetHubFromContext(c); hub != nil {
@@ -58,7 +56,7 @@ func Delete(c *gin.Context) {
 		return
 	}
 
-	if err = repository.Status.Delete(form.ID); err != nil {
+	if err = repository.Status.Delete(statusID); err != nil {
 		if hub := sentrygin.GetHubFromContext(c); hub != nil {
 			hub.CaptureException(err)
 		}
