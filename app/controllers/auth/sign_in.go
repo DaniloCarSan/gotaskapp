@@ -1,12 +1,12 @@
 package auth
 
 import (
-	"gotaskapp/app/database"
-	"gotaskapp/app/security"
+	"gotaskapp/app/entities"
+	fail "gotaskapp/app/failures"
+	"gotaskapp/app/helpers"
+	"gotaskapp/app/repositories/auth"
 	"net/http"
-	"time"
 
-	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,54 +21,30 @@ func SignIn(c *gin.Context) {
 	var form signin
 
 	if err := c.ShouldBind(&form); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		helpers.ApiResponse(c, false, http.StatusBadRequest, "invalid form fields", err.Error())
 		return
 	}
 
-	repository, err := database.Repository()
+	credential, err := auth.SigIn(
+		entities.Auth{
+			Email:    form.Email,
+			Password: form.Password,
+		},
+	)
 
 	if err != nil {
-		if hub := sentrygin.GetHubFromContext(c); hub != nil {
-			hub.CaptureException(err)
+		switch err.(type) {
+		case *fail.DatabaseConnectFailure:
+		case *fail.SqlSelectFailure:
+		case *fail.GenerateJwtTokenFailure:
+			helpers.ApiResponse(c, false, http.StatusInternalServerError, "Server internal error", nil)
+			return
+		case *fail.SqlSelectNotFoundFailure:
+		case *fail.SignInFailure:
+			helpers.ApiResponse(c, false, http.StatusUnauthorized, "Email or password invalid", nil)
+			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{})
-		return
 	}
 
-	user, err := repository.User.ByEmail(form.Email)
-
-	if err != nil {
-		if hub := sentrygin.GetHubFromContext(c); hub != nil {
-			hub.CaptureException(err)
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{})
-		return
-	}
-
-	err = security.CompareHashWithPassword(user.Password, form.Password)
-
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Email or password inválid"})
-		return
-	}
-
-	if !user.IsEmailVerified() {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Email no verified"})
-		return
-	}
-
-	token, err := security.GenerateJwtToken(user.ID, time.Hour*6)
-
-	if err != nil {
-		if hub := sentrygin.GetHubFromContext(c); hub != nil {
-			hub.CaptureException(err)
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{})
-		return
-	}
-
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"user":  user,
-		"token": token,
-	})
+	helpers.ApiResponse(c, true, http.StatusOK, "success", credential)
 }
