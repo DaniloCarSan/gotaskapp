@@ -7,10 +7,8 @@ import (
 	fail "gotaskapp/app/failures"
 	"gotaskapp/app/helpers"
 	"gotaskapp/app/repositories/auth"
-	"gotaskapp/app/security"
 	"net/http"
 	"strings"
-	"time"
 
 	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-gonic/gin"
@@ -53,7 +51,7 @@ func SignUp(c *gin.Context) {
 		Password:  form.Password,
 	}
 
-	id, err := auth.SignUp(user)
+	credential, err := auth.SignUp(user)
 
 	if err != nil {
 		switch err.(type) {
@@ -73,19 +71,7 @@ func SignUp(c *gin.Context) {
 		}
 	}
 
-	user.ID = id
-
-	token, err := security.GenerateJwtToken(user.ID, time.Hour*6)
-
-	if err != nil {
-		if hub := sentrygin.GetHubFromContext(c); hub != nil {
-			hub.CaptureException(err)
-		}
-		helpers.ApiResponse(c, false, http.StatusInternalServerError, "Server internal error", nil)
-		return
-	}
-
-	link := fmt.Sprintf("http://%s%s%s", config.APP_HOST_FULL, "/auth/email/verify/", token)
+	link := fmt.Sprintf("http://%s%s%s", config.APP_HOST_FULL, "/auth/email/verify/", credential.Token)
 
 	emailSignUpbody = strings.ReplaceAll(emailSignUpbody, "{{LINK}}", link)
 
