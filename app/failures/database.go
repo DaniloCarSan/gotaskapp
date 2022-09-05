@@ -53,3 +53,12 @@ type SqlDeleteFailure struct {
 func (e *SqlDeleteFailure) Error() string {
 	return e.M
 }
+
+type GetLastInsertIdFailure struct {
+	M string
+	E error
+}
+
+func (e *GetLastInsertIdFailure) Error() string {
+	return e.M
+}

@@ -14,7 +14,7 @@ func (d *Datasource) ByEmail(email string) (entities.User, error) {
 	)
 
 	if err != nil {
-		return entities.User{}, &fail.SqlSelectFailure{M: "error select user by email", E: err}
+		return entities.User{}, &fail.SqlSelectFailure{M: "error while selecting user by email", E: err}
 	}
 
 	defer rows.Close()

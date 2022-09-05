@@ -7,6 +7,7 @@ import (
 	"gotaskapp/app/repositories/auth"
 	"net/http"
 
+	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-gonic/gin"
 )
 
@@ -34,14 +35,24 @@ func SignIn(c *gin.Context) {
 
 	if err != nil {
 		switch err.(type) {
-		case *fail.DatabaseConnectFailure:
-		case *fail.SqlSelectFailure:
-		case *fail.GenerateJwtTokenFailure:
+		case *fail.DatabaseConnectFailure,
+			*fail.SqlSelectFailure,
+			*fail.PasswordToHashFailure,
+			*fail.GenerateJwtTokenFailure:
+			if hub := sentrygin.GetHubFromContext(c); hub != nil {
+				hub.CaptureException(err)
+			}
 			helpers.ApiResponse(c, false, http.StatusInternalServerError, "Server internal error", nil)
 			return
-		case *fail.SqlSelectNotFoundFailure:
-		case *fail.SignInFailure:
-			helpers.ApiResponse(c, false, http.StatusUnauthorized, "Email or password invalid", nil)
+		case *fail.SqlSelectNotFoundFailure,
+			*fail.SignInFailure:
+			helpers.ApiResponse(c, false, http.StatusUnauthorized, "email or password inválid", nil)
+			return
+		default:
+			if hub := sentrygin.GetHubFromContext(c); hub != nil {
+				hub.CaptureException(err)
+			}
+			helpers.ApiResponse(c, false, http.StatusInternalServerError, "an unexpected error occurred", nil)
 			return
 		}
 	}

@@ -3,9 +3,10 @@ package auth
 import (
 	"fmt"
 	"gotaskapp/app/config"
-	"gotaskapp/app/database"
 	"gotaskapp/app/entities"
+	fail "gotaskapp/app/failures"
 	"gotaskapp/app/helpers"
+	"gotaskapp/app/repositories/auth"
 	"gotaskapp/app/security"
 	"net/http"
 	"strings"
@@ -41,17 +42,7 @@ func SignUp(c *gin.Context) {
 	var form signUp
 
 	if err := c.ShouldBind(&form); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	repository, err := database.Repository()
-
-	if err != nil {
-		if hub := sentrygin.GetHubFromContext(c); hub != nil {
-			hub.CaptureException(err)
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{})
+		helpers.ApiResponse(c, false, http.StatusBadRequest, "error in form data", gin.H{"error": err.Error()})
 		return
 	}
 
@@ -62,42 +53,24 @@ func SignUp(c *gin.Context) {
 		Password:  form.Password,
 	}
 
-	exists, err := repository.User.ByEmail(user.Email)
+	id, err := auth.SignUp(user)
 
 	if err != nil {
-		if hub := sentrygin.GetHubFromContext(c); hub != nil {
-			hub.CaptureException(err)
+		switch err.(type) {
+		case *fail.DatabaseConnectFailure,
+			*fail.SqlInsertFailure,
+			*fail.GenerateJwtTokenFailure,
+			*fail.PasswordToHashFailure,
+			*fail.GetLastInsertIdFailure:
+			if hub := sentrygin.GetHubFromContext(c); hub != nil {
+				hub.CaptureException(err)
+			}
+			helpers.ApiResponse(c, false, http.StatusInternalServerError, "Server internal error", nil)
+			return
+		case *fail.SignUpFailure:
+			helpers.ApiResponse(c, false, http.StatusBadRequest, err.Error(), nil)
+			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{})
-		return
-	}
-
-	if exists.ID > 0 {
-		if hub := sentrygin.GetHubFromContext(c); hub != nil {
-			hub.CaptureException(err)
-		}
-		c.JSON(http.StatusConflict, gin.H{"error": "there is already an account linked to this email"})
-		return
-	}
-
-	err = user.PasswordToHash()
-
-	if err != nil {
-		if hub := sentrygin.GetHubFromContext(c); hub != nil {
-			hub.CaptureException(err)
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{})
-		return
-	}
-
-	id, err := repository.User.Create(user)
-
-	if err != nil {
-		if hub := sentrygin.GetHubFromContext(c); hub != nil {
-			hub.CaptureException(err)
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{})
-		return
 	}
 
 	user.ID = id
@@ -108,7 +81,7 @@ func SignUp(c *gin.Context) {
 		if hub := sentrygin.GetHubFromContext(c); hub != nil {
 			hub.CaptureException(err)
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{})
+		helpers.ApiResponse(c, false, http.StatusInternalServerError, "Server internal error", nil)
 		return
 	}
 
@@ -122,11 +95,15 @@ func SignUp(c *gin.Context) {
 		if hub := sentrygin.GetHubFromContext(c); hub != nil {
 			hub.CaptureException(err)
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{})
+		helpers.ApiResponse(c, false, http.StatusInternalServerError, "Server internal error", nil)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Account created successfully, a verification link has been sent to your email.",
-	})
+	helpers.ApiResponse(
+		c,
+		true,
+		http.StatusOK,
+		"Account created successfully, a verification link has been sent to your email.",
+		nil,
+	)
 }
