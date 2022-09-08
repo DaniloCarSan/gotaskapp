@@ -3,12 +3,11 @@ package auth
 import (
 	"fmt"
 	"gotaskapp/app/config"
-	"gotaskapp/app/database"
+	fail "gotaskapp/app/failures"
 	"gotaskapp/app/helpers"
-	"gotaskapp/app/security"
+	"gotaskapp/app/repositories/auth"
 	"net/http"
 	"strings"
-	"time"
 
 	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-gonic/gin"
@@ -41,51 +40,40 @@ func RequestPasswordReset(c *gin.Context) {
 		return
 	}
 
-	repository, err := database.Repository()
+	credential, err := auth.RequestPasswordReset(form.Email)
 
 	if err != nil {
-		if hub := sentrygin.GetHubFromContext(c); hub != nil {
-			hub.CaptureException(err)
+		switch err.(type) {
+		case *fail.DatabaseConnectFailure,
+			*fail.SqlSelectFailure,
+			*fail.GenerateJwtTokenFailure:
+			if hub := sentrygin.GetHubFromContext(c); hub != nil {
+				hub.CaptureException(err)
+			}
+			helpers.ApiResponse(c, false, http.StatusInternalServerError, "Server internal error", nil)
+			return
+		case *fail.SqlSelectNotFoundFailure:
+			helpers.ApiResponse(c, false, http.StatusNotFound, "email not linked a account", nil)
+			return
+		default:
+			helpers.ApiResponse(c, false, http.StatusInternalServerError, "an unexpected error occurred", nil)
+			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{})
-		return
 	}
 
-	user, err := repository.User.ByEmail(form.Email)
-
-	if err != nil {
-		if hub := sentrygin.GetHubFromContext(c); hub != nil {
-			hub.CaptureException(err)
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{})
-		return
-	}
-
-	token, err := security.GenerateJwtToken(user.ID, time.Hour*6)
-
-	if err != nil {
-		if hub := sentrygin.GetHubFromContext(c); hub != nil {
-			hub.CaptureException(err)
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{})
-		return
-	}
-
-	link := fmt.Sprintf("http://%s%s%s", config.APP_HOST_FULL, "/auth/password/reset/", token)
+	link := fmt.Sprintf("http://%s%s%s", config.APP_HOST_FULL, "/auth/password/reset/", credential.Token)
 
 	emailRequestPasswordResetbody = strings.ReplaceAll(emailRequestPasswordResetbody, "{{LINK}}", link)
 
-	err = helpers.SendEmail([]string{user.Email}, []string{}, "Password Reset", emailRequestPasswordResetbody)
+	err = helpers.SendEmail([]string{credential.User.Email}, []string{}, "Password Reset", emailRequestPasswordResetbody)
 
 	if err != nil {
 		if hub := sentrygin.GetHubFromContext(c); hub != nil {
 			hub.CaptureException(err)
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		helpers.ApiResponse(c, false, http.StatusInternalServerError, "Server internal error to send email verification", nil)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "A password reset link has been sent to your email, if it's not in your inbox check your span.",
-	})
+	helpers.ApiResponse(c, true, http.StatusOK, "A password reset link has been sent to your email, if it's not in your inbox check your span.", nil)
 }
