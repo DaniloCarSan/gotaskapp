@@ -44,9 +44,8 @@ func SignIn(c *gin.Context) {
 			}
 			helpers.ApiResponse(c, false, http.StatusInternalServerError, "Server internal error", nil)
 			return
-		case *fail.SqlSelectNotFoundFailure,
-			*fail.SignInFailure:
-			helpers.ApiResponse(c, false, http.StatusUnauthorized, "email or password inválid", nil)
+		case *fail.SignInFailure:
+			helpers.ApiResponse(c, false, http.StatusUnauthorized, err.Error(), nil)
 			return
 		default:
 			if hub := sentrygin.GetHubFromContext(c); hub != nil {

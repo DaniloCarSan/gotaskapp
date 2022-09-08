@@ -68,6 +68,12 @@ func SignUp(c *gin.Context) {
 		case *fail.SignUpFailure:
 			helpers.ApiResponse(c, false, http.StatusBadRequest, err.Error(), nil)
 			return
+		default:
+			if hub := sentrygin.GetHubFromContext(c); hub != nil {
+				hub.CaptureException(err)
+			}
+			helpers.ApiResponse(c, false, http.StatusInternalServerError, "an unexpected error occurred", nil)
+			return
 		}
 	}
 
