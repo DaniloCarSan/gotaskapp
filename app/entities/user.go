@@ -8,6 +8,7 @@ import (
 
 type User struct {
 	ID        uint64    `json:"id,omitempty"`
+	Avatar    string    `json:"avatar,omitempty"`
 	Firstname string    `json:"firstname,omitempty"`
 	Lastname  string    `json:"lastname,omitempty"`
 	Email     string    `json:"email,omitempty"`

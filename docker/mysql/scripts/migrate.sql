@@ -8,6 +8,7 @@ DROP TABLE IF EXISTS users;
 
 CREATE TABLE IF NOT EXISTS users (
     id INT PRIMARY KEY AUTO_INCREMENT,
+    avatar TEXT UNIQUE,
     firstname VARCHAR(30) NOT NULL,
     lastname VARCHAR(30) NOT NULL,
     email VARCHAR(60) NOT NULL UNIQUE,
@@ -34,9 +35,9 @@ ALTER TABLE tasks
 ADD FOREIGN KEY (user_id) REFERENCES users (id),
 ADD FOREIGN KEY (status_id) REFERENCES status (id) ON DELETE CASCADE;
 
-INSERT INTO users (firstname, lastname, email, password,verified)
+INSERT INTO users (avatar,firstname, lastname, email, password,verified)
 -- password: 123456
-VALUES ("Danilo", "Santos", "danilocarsan@gmail.com", "$2a$10$oj78CETnWUZGWiC0Wy1.cuZSVmaX.UrW.gRhhHiotaoqgBPjfr1HK",'Y');
+VALUES ("https://avatars.githubusercontent.com/u/29821188?v=4","Danilo", "Santos", "danilocarsan@gmail.com", "$2a$10$oj78CETnWUZGWiC0Wy1.cuZSVmaX.UrW.gRhhHiotaoqgBPjfr1HK",'Y');
 
 INSERT INTO status (name, user_id) 
 VALUES ("To view", 1),("To Do", 1), ("Doing", 1), ("Blocked", 1), ("Done", 1), ("Canceled", 1);
