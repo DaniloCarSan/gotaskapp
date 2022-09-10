@@ -22,7 +22,7 @@ func SignIn(c *gin.Context) {
 	var form signin
 
 	if err := c.ShouldBind(&form); err != nil {
-		helpers.ApiResponse(c, false, http.StatusBadRequest, "invalid form fields", err.Error())
+		helpers.ApiResponseError(c, http.StatusBadRequest, "FORM_FIELDS_INVALID", "invalid form fields", err.Error())
 		return
 	}
 
@@ -42,19 +42,19 @@ func SignIn(c *gin.Context) {
 			if hub := sentrygin.GetHubFromContext(c); hub != nil {
 				hub.CaptureException(err)
 			}
-			helpers.ApiResponse(c, false, http.StatusInternalServerError, "Server internal error", nil)
+			helpers.ApiResponseError(c, http.StatusInternalServerError, "SERVER_INTERNAL_ERROR", "Server internal error", nil)
 			return
 		case *fail.SignInFailure:
-			helpers.ApiResponse(c, false, http.StatusUnauthorized, err.Error(), nil)
+			helpers.ApiResponseError(c, http.StatusUnauthorized, "EMAIL_OR_PASSWORD_INVALID", "email or password invalid", nil)
 			return
 		default:
 			if hub := sentrygin.GetHubFromContext(c); hub != nil {
 				hub.CaptureException(err)
 			}
-			helpers.ApiResponse(c, false, http.StatusInternalServerError, "an unexpected error occurred", nil)
+			helpers.ApiResponseError(c, http.StatusInternalServerError, "SERVER_INTERNAL_ERROR", "Server internal error", nil)
 			return
 		}
 	}
 
-	helpers.ApiResponse(c, true, http.StatusOK, "success", credential)
+	helpers.ApiResponseSuccess(c, http.StatusOK, credential)
 }
