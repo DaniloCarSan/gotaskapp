@@ -78,7 +78,7 @@ func SignUp(c *gin.Context) {
 	}
 
 	go func() {
-		link := fmt.Sprintf("http://%s%s%s", config.APP_HOST_FULL, "/auth/email/verify/", credential.Token)
+		link := fmt.Sprintf("%s%s%s", config.APP_URL, "/auth/email/verify/", credential.Token)
 
 		emailSignUpbody = strings.ReplaceAll(emailSignUpbody, "{{LINK}}", link)
 
