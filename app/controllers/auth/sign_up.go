@@ -40,7 +40,7 @@ func SignUp(c *gin.Context) {
 	var form signUp
 
 	if err := c.ShouldBind(&form); err != nil {
-		helpers.ApiResponse(c, false, http.StatusBadRequest, "error in form data", gin.H{"error": err.Error()})
+		helpers.ApiResponseError(c, http.StatusBadRequest, "FORM_VALIDATE_ERROR", err.Error(), nil)
 		return
 	}
 
@@ -63,33 +63,33 @@ func SignUp(c *gin.Context) {
 			if hub := sentrygin.GetHubFromContext(c); hub != nil {
 				hub.CaptureException(err)
 			}
-			helpers.ApiResponse(c, false, http.StatusInternalServerError, "Server internal error", nil)
+			helpers.ApiResponseError(c, http.StatusInternalServerError, "SERVER_INTERNAL_ERROR", "Internal server error", nil)
 			return
 		case *fail.SignUpFailure:
-			helpers.ApiResponse(c, false, http.StatusBadRequest, err.Error(), nil)
+			helpers.ApiResponseError(c, http.StatusBadRequest, "SIGN_UP_ERROR", err.Error(), nil)
 			return
 		default:
 			if hub := sentrygin.GetHubFromContext(c); hub != nil {
 				hub.CaptureException(err)
 			}
-			helpers.ApiResponse(c, false, http.StatusInternalServerError, "an unexpected error occurred", nil)
+			helpers.ApiResponseError(c, http.StatusInternalServerError, "SERVER_INTERNAL_ERROR", "an unexpected error occurred", nil)
 			return
 		}
 	}
 
-	link := fmt.Sprintf("http://%s%s%s", config.APP_HOST_FULL, "/auth/email/verify/", credential.Token)
+	go func() {
+		link := fmt.Sprintf("http://%s%s%s", config.APP_HOST_FULL, "/auth/email/verify/", credential.Token)
 
-	emailSignUpbody = strings.ReplaceAll(emailSignUpbody, "{{LINK}}", link)
+		emailSignUpbody = strings.ReplaceAll(emailSignUpbody, "{{LINK}}", link)
 
-	err = helpers.SendEmail([]string{user.Email}, []string{}, "Confirmação de email", emailSignUpbody)
+		err = helpers.SendEmail([]string{user.Email}, []string{}, "Confirmação de email", emailSignUpbody)
 
-	if err != nil {
-		if hub := sentrygin.GetHubFromContext(c); hub != nil {
-			hub.CaptureException(err)
+		if err != nil {
+			if hub := sentrygin.GetHubFromContext(c); hub != nil {
+				hub.CaptureException(err)
+			}
 		}
-		helpers.ApiResponse(c, false, http.StatusInternalServerError, "Server internal error", nil)
-		return
-	}
+	}()
 
 	helpers.ApiResponse(
 		c,
