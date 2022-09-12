@@ -24,6 +24,7 @@ func (r *Repository) ByEmail(email string) (entities.User, error) {
 
 	err = rows.Scan(
 		&user.ID,
+		&user.Avatar,
 		&user.Firstname,
 		&user.Lastname,
 		&user.Email,
