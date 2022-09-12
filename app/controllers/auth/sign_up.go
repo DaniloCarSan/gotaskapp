@@ -1,31 +1,18 @@
 package auth
 
 import (
-	"fmt"
+	"bytes"
+	"encoding/json"
 	"gotaskapp/app/config"
 	"gotaskapp/app/entities"
 	fail "gotaskapp/app/failures"
 	"gotaskapp/app/helpers"
 	"gotaskapp/app/repositories/auth"
 	"net/http"
-	"strings"
 
 	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-gonic/gin"
 )
-
-var emailSignUpbody = `
-<html>
-<head>
-   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-   <title>Link de confirmação da conta</title>
-</head>
-<body>
-   <p>Obrigago por criar uma conta no <b>Go TaskApp</b></p>
-   <p>Clique neste link <a href="{{LINK}}">aqui</a> para confirmar seu email.</p>
-   <p>Caso não tenha criado uma conta ignore este email.</p>
-</body>
-`
 
 type signUp struct {
 	Firstname string `form:"firstname" binding:"required,alpha"`
@@ -51,7 +38,7 @@ func SignUp(c *gin.Context) {
 		Password:  form.Password,
 	}
 
-	credential, err := auth.SignUp(user)
+	_, err := auth.SignUp(user)
 
 	if err != nil {
 		switch err.(type) {
@@ -78,17 +65,15 @@ func SignUp(c *gin.Context) {
 	}
 
 	go func() {
-		link := fmt.Sprintf("%s%s%s", config.APP_URL, "/auth/email/verify/", credential.Token)
+		// Send email verification
+		body, _ := json.Marshal(
+			map[string]string{
+				"email": form.Email,
+			},
+		)
+		payload := bytes.NewBuffer(body)
 
-		emailSignUpbody = strings.ReplaceAll(emailSignUpbody, "{{LINK}}", link)
-
-		err = helpers.SendEmail([]string{user.Email}, []string{}, "Confirmação de email", emailSignUpbody)
-
-		if err != nil {
-			if hub := sentrygin.GetHubFromContext(c); hub != nil {
-				hub.CaptureException(err)
-			}
-		}
+		http.Post(config.APP_URL+"/auth/send/email/verification", "application/json", payload)
 	}()
 
 	helpers.ApiResponse(

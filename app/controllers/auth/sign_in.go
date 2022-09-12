@@ -44,14 +44,19 @@ func SignIn(c *gin.Context) {
 			}
 			helpers.ApiResponseError(c, http.StatusInternalServerError, "SERVER_INTERNAL_ERROR", "Server internal error", nil)
 			return
-		case *fail.SignInFailure:
+		case *fail.EmailNotVerifiedFailure:
+			helpers.ApiResponseError(c, http.StatusBadRequest, "EMAIL_NOT_VERIFIED", "Email not verified", nil)
+			return
+		case
+			*fail.SignInFailure,
+			*fail.SqlSelectNotFoundFailure:
 			helpers.ApiResponseError(c, http.StatusUnauthorized, "EMAIL_OR_PASSWORD_INVALID", "email or password invalid", nil)
 			return
 		default:
 			if hub := sentrygin.GetHubFromContext(c); hub != nil {
 				hub.CaptureException(err)
 			}
-			helpers.ApiResponseError(c, http.StatusInternalServerError, "SERVER_INTERNAL_ERROR", "Server internal error", nil)
+			helpers.ApiResponseError(c, http.StatusInternalServerError, "SERVER_INTERNAL_ERROR", err.Error(), nil)
 			return
 		}
 	}

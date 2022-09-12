@@ -29,7 +29,7 @@ func SigIn(auth entities.Auth) (entities.Credential, error) {
 	}
 
 	if !user.IsEmailVerified() {
-		return entities.Credential{}, &fail.SignInFailure{M: "email no verified", E: err}
+		return entities.Credential{}, &fail.EmailNotVerifiedFailure{M: "The email " + auth.Email + " unverified, please check your inbox.", E: err}
 	}
 
 	token, err := security.GenerateJwtToken(user.ID, time.Hour*365)
