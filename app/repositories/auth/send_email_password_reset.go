@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func RequestPasswordReset(email string) (entities.Credential, error) {
+func SendEmailPasswordReset(email string) (entities.Credential, error) {
 
 	datasources, err := database.Datasources()
 
