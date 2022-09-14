@@ -45,7 +45,7 @@ func SignIn(c *gin.Context) {
 			helpers.ApiResponseError(c, http.StatusInternalServerError, "SERVER_INTERNAL_ERROR", "Server internal error", nil)
 			return
 		case *fail.EmailNotVerifiedFailure:
-			helpers.ApiResponseError(c, http.StatusBadRequest, "EMAIL_NOT_VERIFIED", "Email not verified", nil)
+			helpers.ApiResponseError(c, http.StatusBadRequest, "EMAIL_NOT_VERIFIED", "The email linked to this account has not been verified", nil)
 			return
 		case
 			*fail.SignInFailure,

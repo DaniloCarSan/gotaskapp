@@ -9,8 +9,9 @@ type apiResponse struct {
 	Data    interface{} `json:"data"`
 }
 
-type apiResponseError struct {
-	Error   string      `json:"error"`
+type apiRes struct {
+	Status  bool        `json:"status"`
+	Code    string      `json:"code"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data"`
 }
@@ -25,12 +26,18 @@ func ApiResponse(c *gin.Context, Status bool, code int, message string, data int
 }
 
 func ApiResponseSuccess(c *gin.Context, code int, data interface{}) {
-	c.JSON(code, data)
+	c.JSON(code, apiRes{
+		Code:    "SUCCESS",
+		Status:  true,
+		Message: "success",
+		Data:    data,
+	})
 }
 
-func ApiResponseError(c *gin.Context, code int, error string, message string, data interface{}) {
-	c.JSON(code, apiResponseError{
-		Error:   error,
+func ApiResponseError(c *gin.Context, code int, err string, message string, data interface{}) {
+	c.JSON(code, apiRes{
+		Status:  false,
+		Code:    err,
 		Message: message,
 		Data:    data,
 	})
