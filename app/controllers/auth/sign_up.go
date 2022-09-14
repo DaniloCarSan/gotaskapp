@@ -76,9 +76,8 @@ func SignUp(c *gin.Context) {
 		http.Post(config.APP_URL+"/auth/send/email/verification", "application/json", payload)
 	}()
 
-	helpers.ApiResponse(
+	helpers.ApiResponseSuccess1(
 		c,
-		true,
 		http.StatusOK,
 		"Account created successfully, a verification link has been sent to your email.",
 		nil,

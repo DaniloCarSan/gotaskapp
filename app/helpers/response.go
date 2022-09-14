@@ -34,6 +34,15 @@ func ApiResponseSuccess(c *gin.Context, code int, data interface{}) {
 	})
 }
 
+func ApiResponseSuccess1(c *gin.Context, code int, message string, data interface{}) {
+	c.JSON(code, apiRes{
+		Code:    "SUCCESS",
+		Status:  true,
+		Message: message,
+		Data:    data,
+	})
+}
+
 func ApiResponseError(c *gin.Context, code int, err string, message string, data interface{}) {
 	c.JSON(code, apiRes{
 		Status:  false,
