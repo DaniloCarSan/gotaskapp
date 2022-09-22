@@ -34,7 +34,7 @@ func SendEmailVerification(c *gin.Context) {
 	var form sendEmailVerification
 
 	if err := c.ShouldBind(&form); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		helpers.ApiResponseError(c, http.StatusBadRequest, "FORM_FIELDS_INVALID", err.Error(), nil)
 		return
 	}
 

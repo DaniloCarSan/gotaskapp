@@ -3,6 +3,7 @@ package auth
 import (
 	"gotaskapp/app/database"
 	"gotaskapp/app/entities"
+	"gotaskapp/app/helpers"
 	"gotaskapp/app/security"
 	"net/http"
 	"strings"
@@ -22,7 +23,7 @@ func PasswordReset(c *gin.Context) {
 	var form passwordReset
 
 	if err := c.ShouldBind(&form); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		helpers.ApiResponseError(c, http.StatusBadRequest, "FORM_FIELDS_INVALID", err.Error(), nil)
 		return
 	}
 
@@ -32,7 +33,7 @@ func PasswordReset(c *gin.Context) {
 	var id uint64
 
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, "Error, invalid confirmation token or it has expired, request another")
+		helpers.ApiResponseError(c, http.StatusBadRequest, "INVALID_TOKEN", "Error, invalid confirmation token or it has expired, request another", nil)
 		return
 	}
 
@@ -42,7 +43,7 @@ func PasswordReset(c *gin.Context) {
 		if hub := sentrygin.GetHubFromContext(c); hub != nil {
 			hub.CaptureException(err)
 		}
-		c.JSON(http.StatusInternalServerError, err.Error())
+		helpers.ApiResponseError(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", err.Error(), nil)
 		return
 	}
 
@@ -52,19 +53,19 @@ func PasswordReset(c *gin.Context) {
 		if hub := sentrygin.GetHubFromContext(c); hub != nil {
 			hub.CaptureException(err)
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{})
+		helpers.ApiResponseError(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", err.Error(), nil)
 		return
 	}
 
 	var user entities.User
 
 	if user, err = repository.User.ById(id); err != nil {
-		c.JSON(http.StatusUnauthorized, "error, invalid confirmation token or it has expired, request another")
+		helpers.ApiResponseError(c, http.StatusUnauthorized, "USER_NOT_FOUND", "error, invalid confirmation token or it has expired, request another", nil)
 		return
 	}
 
 	if !strings.EqualFold(user.Email, form.Email) {
-		c.JSON(http.StatusUnauthorized, "the email provided does not correspond to this password reset request.")
+		helpers.ApiResponseError(c, http.StatusUnauthorized, "EMAIL_NOT_FOUND", "the email provided does not correspond to this password reset request.", nil)
 		return
 	}
 
@@ -76,7 +77,7 @@ func PasswordReset(c *gin.Context) {
 		if hub := sentrygin.GetHubFromContext(c); hub != nil {
 			hub.CaptureException(err)
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "an internal error occurred, please try again later."})
+		helpers.ApiResponseError(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "an internal error occurred, please try again later.", nil)
 		return
 	}
 
@@ -86,9 +87,9 @@ func PasswordReset(c *gin.Context) {
 		if hub := sentrygin.GetHubFromContext(c); hub != nil {
 			hub.CaptureException(err)
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "an internal error occurred, please try again later."})
+		helpers.ApiResponseError(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "an internal error occurred, please try again later.", nil)
 		return
 	}
 
-	c.JSON(http.StatusOK, "Password successfully changed, sign in now and enjoy our features.")
+	helpers.ApiResponseSuccess1(c, http.StatusOK, "Password successfully changed, sign in now and enjoy our features.", nil)
 }

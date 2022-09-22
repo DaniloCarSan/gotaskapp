@@ -27,7 +27,7 @@ func SignUp(c *gin.Context) {
 	var form signUp
 
 	if err := c.ShouldBind(&form); err != nil {
-		helpers.ApiResponseError(c, http.StatusBadRequest, "FORM_VALIDATE_ERROR", err.Error(), nil)
+		helpers.ApiResponseError(c, http.StatusBadRequest, "FORM_FIELDS_INVALID", err.Error(), nil)
 		return
 	}
 
