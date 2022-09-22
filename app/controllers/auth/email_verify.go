@@ -3,6 +3,7 @@ package auth
 import (
 	"gotaskapp/app/database"
 	"gotaskapp/app/entities"
+	"gotaskapp/app/helpers"
 	"gotaskapp/app/security"
 	"net/http"
 
@@ -20,7 +21,7 @@ func EmailVerify(c *gin.Context) {
 	var user entities.User
 
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, "Error, invalid confirmation token or it has expired, request another")
+		helpers.ApiResponseError(c, http.StatusUnauthorized, "INVALID_TOKEN", "Error, invalid confirmation token or it has expired, request another", nil)
 		return
 	}
 
@@ -30,7 +31,7 @@ func EmailVerify(c *gin.Context) {
 		if hub := sentrygin.GetHubFromContext(c); hub != nil {
 			hub.CaptureException(err)
 		}
-		c.JSON(http.StatusInternalServerError, err.Error())
+		helpers.ApiResponseError(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "Server internal error", nil)
 		return
 	}
 
@@ -40,12 +41,12 @@ func EmailVerify(c *gin.Context) {
 		if hub := sentrygin.GetHubFromContext(c); hub != nil {
 			hub.CaptureException(err)
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{})
+		helpers.ApiResponseError(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "Server internal error", nil)
 		return
 	}
 
 	if user, err = repository.User.ById(id); err != nil {
-		c.JSON(http.StatusUnauthorized, "Error, invalid confirmation token or it has expired, request another")
+		helpers.ApiResponseError(c, http.StatusUnauthorized, "INVALID_TOKEN", "Error, invalid confirmation token or it has expired, request another", nil)
 		return
 	}
 
@@ -55,10 +56,10 @@ func EmailVerify(c *gin.Context) {
 			if hub := sentrygin.GetHubFromContext(c); hub != nil {
 				hub.CaptureException(err)
 			}
-			c.JSON(http.StatusInternalServerError, "Server internal error")
+			helpers.ApiResponseError(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "Server internal error", nil)
 			return
 		}
 	}
 
-	c.JSON(http.StatusOK, "Email successfully confirmed, enjoy the app")
+	helpers.ApiResponseSuccess1(c, http.StatusOK, "Email successfully confirmed, enjoy the app.", nil)
 }
