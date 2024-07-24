@@ -13,6 +13,7 @@ var (
 	APP_PORT       = ""
 	APP_HOST       = ""
 	APP_HOST_FULL  = ""
+	APP_URL        = ""
 	SENTRY_DNS     = ""
 	DB_DRIVE       = "mysql"
 	DB_ADDR        = "%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local"
@@ -52,6 +53,8 @@ func Load(fileEnv string) error {
 	APP_PORT = value
 
 	APP_HOST_FULL = fmt.Sprintf("%s:%s", APP_HOST, APP_PORT)
+
+	APP_URL = fmt.Sprintf("http://%s", APP_HOST_FULL)
 
 	value, exists = os.LookupEnv("SENTRY_DNS")
 	if value == "" || !exists {

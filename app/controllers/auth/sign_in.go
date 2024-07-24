@@ -1,10 +1,11 @@
 package auth
 
 import (
-	"gotaskapp/app/database"
-	"gotaskapp/app/security"
+	"gotaskapp/app/entities"
+	fail "gotaskapp/app/failures"
+	"gotaskapp/app/helpers"
+	"gotaskapp/app/repositories/auth"
 	"net/http"
-	"time"
 
 	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-gonic/gin"
@@ -21,54 +22,44 @@ func SignIn(c *gin.Context) {
 	var form signin
 
 	if err := c.ShouldBind(&form); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		helpers.ApiResponseError(c, http.StatusBadRequest, "FORM_FIELDS_INVALID", "invalid form fields", err.Error())
 		return
 	}
 
-	repository, err := database.Repository()
+	credential, err := auth.SigIn(
+		entities.Auth{
+			Email:    form.Email,
+			Password: form.Password,
+		},
+	)
 
 	if err != nil {
-		if hub := sentrygin.GetHubFromContext(c); hub != nil {
-			hub.CaptureException(err)
+		switch err.(type) {
+		case *fail.DatabaseConnectFailure,
+			*fail.SqlSelectFailure,
+			*fail.PasswordToHashFailure,
+			*fail.GenerateJwtTokenFailure:
+			if hub := sentrygin.GetHubFromContext(c); hub != nil {
+				hub.CaptureException(err)
+			}
+			helpers.ApiResponseError(c, http.StatusInternalServerError, "SERVER_INTERNAL_ERROR", "Server internal error", nil)
+			return
+		case *fail.EmailNotVerifiedFailure:
+			helpers.ApiResponseError(c, http.StatusBadRequest, "EMAIL_NOT_VERIFIED", "The email linked to this account has not been verified", nil)
+			return
+		case
+			*fail.SignInFailure,
+			*fail.SqlSelectNotFoundFailure:
+			helpers.ApiResponseError(c, http.StatusUnauthorized, "EMAIL_OR_PASSWORD_INVALID", "email or password invalid", nil)
+			return
+		default:
+			if hub := sentrygin.GetHubFromContext(c); hub != nil {
+				hub.CaptureException(err)
+			}
+			helpers.ApiResponseError(c, http.StatusInternalServerError, "SERVER_INTERNAL_ERROR", err.Error(), nil)
+			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{})
-		return
 	}
 
-	user, err := repository.User.ByEmail(form.Email)
-
-	if err != nil {
-		if hub := sentrygin.GetHubFromContext(c); hub != nil {
-			hub.CaptureException(err)
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{})
-		return
-	}
-
-	err = security.CompareHashWithPassword(user.Password, form.Password)
-
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Email or password inválid"})
-		return
-	}
-
-	if !user.IsEmailVerified() {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Email no verified"})
-		return
-	}
-
-	token, err := security.GenerateJwtToken(user.ID, time.Hour*6)
-
-	if err != nil {
-		if hub := sentrygin.GetHubFromContext(c); hub != nil {
-			hub.CaptureException(err)
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{})
-		return
-	}
-
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"user":  user,
-		"token": token,
-	})
+	helpers.ApiResponseSuccess(c, http.StatusOK, credential)
 }

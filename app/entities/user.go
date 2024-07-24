@@ -4,16 +4,19 @@ import (
 	"gotaskapp/app/security"
 	"strings"
 	"time"
+
+	"gopkg.in/guregu/null.v4/zero"
 )
 
 type User struct {
-	ID        uint64    `json:"id,omitempty"`
-	Firstname string    `json:"firstname,omitempty"`
-	Lastname  string    `json:"lastname,omitempty"`
-	Email     string    `json:"email,omitempty"`
-	Password  string    `json:"-"`
-	Verified  string    `json:"verified"`
-	CreateAt  time.Time `json:"-"`
+	ID        uint64      `json:"id,omitempty"`
+	Avatar    zero.String `json:"avatar,omitempty"`
+	Firstname string      `json:"firstname,omitempty"`
+	Lastname  string      `json:"lastname,omitempty"`
+	Email     string      `json:"email,omitempty"`
+	Password  string      `json:"-"`
+	Verified  string      `json:"verified"`
+	CreateAt  time.Time   `json:"-"`
 }
 
 // Convert password to hash

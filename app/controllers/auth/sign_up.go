@@ -1,32 +1,18 @@
 package auth
 
 import (
-	"fmt"
+	"bytes"
+	"encoding/json"
 	"gotaskapp/app/config"
-	"gotaskapp/app/database"
 	"gotaskapp/app/entities"
+	fail "gotaskapp/app/failures"
 	"gotaskapp/app/helpers"
-	"gotaskapp/app/security"
+	"gotaskapp/app/repositories/auth"
 	"net/http"
-	"strings"
-	"time"
 
 	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-gonic/gin"
 )
-
-var emailSignUpbody = `
-<html>
-<head>
-   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-   <title>Link de confirmação da conta</title>
-</head>
-<body>
-   <p>Obrigago por criar uma conta no <b>Go TaskApp</b></p>
-   <p>Clique neste link <a href="{{LINK}}">aqui</a> para confirmar seu email.</p>
-   <p>Caso não tenha criado uma conta ignore este email.</p>
-</body>
-`
 
 type signUp struct {
 	Firstname string `form:"firstname" binding:"required,alpha"`
@@ -41,17 +27,7 @@ func SignUp(c *gin.Context) {
 	var form signUp
 
 	if err := c.ShouldBind(&form); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	repository, err := database.Repository()
-
-	if err != nil {
-		if hub := sentrygin.GetHubFromContext(c); hub != nil {
-			hub.CaptureException(err)
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{})
+		helpers.ApiResponseError(c, http.StatusBadRequest, "FORM_FIELDS_INVALID", err.Error(), nil)
 		return
 	}
 
@@ -62,71 +38,48 @@ func SignUp(c *gin.Context) {
 		Password:  form.Password,
 	}
 
-	exists, err := repository.User.ByEmail(user.Email)
+	_, err := auth.SignUp(user)
 
 	if err != nil {
-		if hub := sentrygin.GetHubFromContext(c); hub != nil {
-			hub.CaptureException(err)
+		switch err.(type) {
+		case *fail.DatabaseConnectFailure,
+			*fail.SqlInsertFailure,
+			*fail.GenerateJwtTokenFailure,
+			*fail.PasswordToHashFailure,
+			*fail.GetLastInsertIdFailure:
+			if hub := sentrygin.GetHubFromContext(c); hub != nil {
+				hub.CaptureException(err)
+			}
+			helpers.ApiResponseError(c, http.StatusInternalServerError, "SERVER_INTERNAL_ERROR", "Internal server error", nil)
+			return
+		case *fail.SignUpFailure:
+			helpers.ApiResponseError(c, http.StatusBadRequest, "SIGN_UP_ERROR", err.Error(), nil)
+			return
+		default:
+			if hub := sentrygin.GetHubFromContext(c); hub != nil {
+				hub.CaptureException(err)
+			}
+			helpers.ApiResponseError(c, http.StatusInternalServerError, "SERVER_INTERNAL_ERROR", "an unexpected error occurred", nil)
+			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{})
-		return
 	}
 
-	if exists.ID > 0 {
-		if hub := sentrygin.GetHubFromContext(c); hub != nil {
-			hub.CaptureException(err)
-		}
-		c.JSON(http.StatusConflict, gin.H{"error": "there is already an account linked to this email"})
-		return
-	}
+	go func() {
+		// Send email verification
+		body, _ := json.Marshal(
+			map[string]string{
+				"email": form.Email,
+			},
+		)
+		payload := bytes.NewBuffer(body)
 
-	err = user.PasswordToHash()
+		http.Post(config.APP_URL+"/auth/send/email/verification", "application/json", payload)
+	}()
 
-	if err != nil {
-		if hub := sentrygin.GetHubFromContext(c); hub != nil {
-			hub.CaptureException(err)
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{})
-		return
-	}
-
-	id, err := repository.User.Create(user)
-
-	if err != nil {
-		if hub := sentrygin.GetHubFromContext(c); hub != nil {
-			hub.CaptureException(err)
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{})
-		return
-	}
-
-	user.ID = id
-
-	token, err := security.GenerateJwtToken(user.ID, time.Hour*6)
-
-	if err != nil {
-		if hub := sentrygin.GetHubFromContext(c); hub != nil {
-			hub.CaptureException(err)
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{})
-		return
-	}
-
-	link := fmt.Sprintf("http://%s%s%s", config.APP_HOST_FULL, "/auth/email/verify/", token)
-
-	emailSignUpbody = strings.ReplaceAll(emailSignUpbody, "{{LINK}}", link)
-
-	err = helpers.SendEmail([]string{user.Email}, []string{}, "Confirmação de email", emailSignUpbody)
-
-	if err != nil {
-		if hub := sentrygin.GetHubFromContext(c); hub != nil {
-			hub.CaptureException(err)
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Account created successfully, a verification link has been sent to your email.",
-	})
+	helpers.ApiResponseSuccess1(
+		c,
+		http.StatusOK,
+		"Account created successfully, a verification link has been sent to your email.",
+		nil,
+	)
 }

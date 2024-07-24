@@ -1,23 +1,26 @@
 package user
 
-import "gotaskapp/app/entities"
+import (
+	"gotaskapp/app/entities"
+	fail "gotaskapp/app/failures"
+)
 
 // Select a user by email
-func (r *Repository) ByEmail(email string) (entities.User, error) {
+func (d *Datasource) ByEmail(email string) (entities.User, error) {
 
-	rows, err := r.DB.Query(
+	rows, err := d.DB.Query(
 		"SELECT * FROM users WHERE email = ? LIMIT 1",
 		email,
 	)
 
 	if err != nil {
-		return entities.User{}, err
+		return entities.User{}, &fail.SqlSelectFailure{M: "error while selecting user by email", E: err}
 	}
 
 	defer rows.Close()
 
 	if !rows.Next() {
-		return entities.User{}, nil
+		return entities.User{}, &fail.SqlSelectNotFoundFailure{M: "user not found", E: err}
 	}
 
 	var user entities.User
